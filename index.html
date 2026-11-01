@@ -69,13 +69,13 @@ h2{font:600 26px/28px Caveat,cursive;margin:0 0 4px}
 <li>Потом у тебя 2 действия: разыграть карту (добро за очки добра) или перейти в соседнюю комнату. Призвать монстра из руки за очки зла тоже стоит действие.</li>
 <li>Новая комната: бросок d6. Больше очков зла комнаты — засады нет, иначе нападают монстры на сумму не больше этого зла. Вход даёт очки зла, равные злу комнаты.</li>
 <li>Бой: d6 плюс стат против d6 плюс тот же стат защитника. Побеждает атакующий, если сумма больше, урон равен стату.</li>
-<li>За убитого монстра получаешь очки добра, равные его цене. Предметы занимают груз (всего 3).</li>
+<li>Побег бросается на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку (и ты тоже, если есть предмет на дальность). Оставшиеся монстры настигают тебя в начале следующего хода.</li><li>За убитого монстра получаешь очки добра, равные его цене. Предметы занимают груз (всего 3).</li>
 <li>Когда заканчиваешь ход, нужно сбросить минимум одну карту по своему выбору (если в руке больше 5, то столько, чтобы осталось 5). Добро уходит в сброс, монстры возвращаются в логово. Потом рука добирается до 5 карт.</li><li>Выход лежит в нижней части колоды. Вход в него заканчивает этаж. Комнаты в колоде конечны: если они кончились, а выход не найден, этаж проигран.</li></ul></details>
 <div id="app"></div><p class="mut">Нашёл странность или есть идея? Расскажи тому, кто прислал ссылку: именно для этого прототип и нужен.</p></main>
 <script>
 const r=n=>Math.floor(Math.random()*n),d6=()=>1+r(6),sh=a=>{for(let i=a.length-1;i>0;i--){const j=r(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
-const MON={gob:{n:'Гоблин',c:1,hp:3,p:1,m:1,a:2},arb:{n:'Гоблин с арбалетом',c:2,hp:3,p:2,m:1,a:1},ske:{n:'Скелет',c:2,hp:4,p:2,m:1,a:1},spe:{n:'Скелет-копейщик',c:3,hp:4,p:3,m:1,a:0},zom:{n:'Зомби',c:2,hp:6,p:2,m:1,a:0},shd:{n:'Зомби со щитом',c:3,hp:7,p:2,m:1,a:1,sh:1}};
-const IT={pl:{n:'Стальные пластины',cap:2,g:1,p:1,e:'+1 физ'},le:{n:'Кристалл-линза',cap:2,g:1,m:1,e:'+1 маг'},sp:{n:'Пружинные сочленения',cap:1,g:1,a:1,e:'+1 ловк'},tk:{n:'Запасной бак',cap:1,g:1,hp:2,e:'+2 HP'},ar:{n:'Бронеплита',cap:3,g:2,hp:3,e:'+3 HP'}};
+const MON={gob:{n:'Гоблин',r:1,c:1,hp:3,p:1,m:1,a:2},arb:{n:'Гоблин с арбалетом',r:2,c:2,hp:3,p:2,m:1,a:1},ske:{n:'Скелет',r:1,c:2,hp:4,p:2,m:1,a:1},spe:{n:'Скелет-копейщик',r:2,c:3,hp:4,p:3,m:1,a:0},zom:{n:'Зомби',r:1,c:2,hp:6,p:2,m:1,a:0},shd:{n:'Зомби со щитом',r:1,c:3,hp:7,p:2,m:1,a:1,sh:1}};
+const IT={pl:{n:'Стальные пластины',cap:2,g:1,p:1,e:'+1 физ'},le:{n:'Кристалл-линза',cap:2,g:1,m:1,e:'+1 маг'},sp:{n:'Пружинные сочленения',cap:1,g:1,a:1,e:'+1 ловк'},rg:{n:'Манипулятор-удлинитель',cap:1,g:1,r:1,e:'+1 дальность'},tk:{n:'Запасной бак',cap:1,g:1,hp:2,e:'+2 HP'},ar:{n:'Бронеплита',cap:3,g:2,hp:3,e:'+3 HP'}};
 const SP={rep:{n:'Ремонт',g:1,e:'+3 HP сейчас'},ov:{n:'Перегрузка',g:1,p:2,e:'+2 физ до конца боя'},fo:{n:'Фокус',g:1,m:2,e:'+2 маг до конца боя'},lu:{n:'Смазка',g:1,a:2,e:'+2 ловк до конца боя'}};
 const BUILDS=[{n:'Силач',s:[3,1,1]},{n:'Маг',s:[1,3,1]},{n:'Универсал',s:[2,2,1]}];
 const NM={start:'Вход',norm:'Комната',rest:'Комната отдыха',loot:'Комната с добычей',exit:'Выход с этажа'};
@@ -94,16 +94,18 @@ const TS=[{s:'w-field',t:'Каждый ход начинается с комна
 {s:'w-char',t:'У тебя 2 действия за ход. Действие это переход в соседнюю комнату или розыгрыш карты. Физ и маг дают урон, ловкость нужна для побега.'},
 {s:'w-field',t:'Нажми на соседнюю комнату, чтобы перейти в неё. В новой комнате бросается d6: если выпало больше числа зла комнаты, засады нет.'},
 {s:'w-log',t:'Здесь записан каждый бросок: кубик плюс стат нападающего против кубика плюс тот же стат защищающегося. Если сумма нападающего больше, он попал, а урон равен стату его атаки.'},
+{s:'w-enemy',t:'Побег решается тем же броском на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку. Предмет на дальность даст выстрел в ответ.'},
 {s:'w-hand',t:'Карты добра стоят очки добра, а их дают за убитых монстров. Монстров из руки можно призвать за очки зла, которые даёт вход в новую комнату. В конце каждого хода нужно сбросить минимум одну карту, а потом рука добирается до 5.'},
 {s:'w-items',t:'Предметы занимают груз (всего 3) и дают постоянные бонусы. Снятый предмет уходит в сброс. Цель этажа: найти выход, он лежит в нижней части колоды. Комнаты в колоде конечны: если они закончатся до выхода, ты проиграешь.'}];
 let T={on:1,i:0};try{if(localStorage.getItem('gt'))T.on=0}catch(e){}
 function tn(sk){if(sk||T.i+1>=TS.length){T.on=0;try{localStorage.setItem('gt','1')}catch(e){}}else T.i++;ui()}
 const eff=k=>G.s[k]+G.tmp[k]+G.eq.reduce((x,i)=>x+(i[k]||0),0);
+const rng=()=>1+G.eq.reduce((x,i)=>x+(i.r||0),0);
 const cap=()=>G.eq.reduce((x,i)=>x+i.cap,0);
 const rs=()=>{if(!G.evil.length&&G.eDis.length){G.evil=sh(G.eDis);G.eDis=[]}};
 const lab=rm=>rm.t==='start'?'Вход':rm.t==='norm'?'Зло '+rm.e:rm.t==='rest'?'Отдых':rm.t==='loot'?'Лут, зло '+rm.e:'Выход';
 function go(b){
- const it=['pl','pl','le','sp','tk','ar'].map(k=>({t:'item',k,...IT[k]}));
+ const it=['pl','pl','le','sp','rg','tk','ar'].map(k=>({t:'item',k,...IT[k]}));
  const spl=['rep','rep','rep','ov','ov','fo','fo','lu'].map(k=>({t:'spell',k,...SP[k]}));
  const d=sh([...[1,1,1,2,2,2,3,3].map(e=>({t:'norm',e})),{t:'rest'},{t:'rest'},{t:'loot',e:4},{t:'loot',e:4}]);
  d.forEach(x=>x.mons=[]);d.splice(r(5),0,{t:'exit',mons:[]});
@@ -138,16 +140,24 @@ function mTurn(){const m=G.B.mons[0],x=d6(),y=d6(),dm=eff('p'),ok=x+m.p>y+dm;
  LR(m.n,'p',x,m.p,y,dm,ok,m.p);
  if(ok){FX('gh',m.p);G.hp-=m.p;if(G.hp<=0){G.hp=0;G.over='lose'}}}
 function act(k){const B=G.B;if(!B||G.over)return;const m=B.mons[0],x=d6(),y=d6();
- if(k==='a'){const ok=x+eff('a')>y+m.a;LE(x,eff('a'),y,m.a,ok);
+ if(k==='a'){const mg=x+eff('a')-y-m.a,ok=mg>0;LE(x,eff('a'),y,m.a,ok);
   if(ok){G.tmp={p:0,m:0,a:0};G.B=null;
-   if(B.amb){G.pos=G.prev;L('Голем отступил в прошлую комнату. Монстры остались в той комнате с прежним HP.')}
-   else{G.evil.unshift(...B.mons.map(c=>(c.hp=c.mx,c)));L('Призванный монстр вернулся в логово.')}
+   if(!B.amb){G.evil.unshift(...B.mons.map(c=>(c.hp=c.mx,c)));L('Призванный монстр вернулся в логово.')}
+   else if(mg>=3){G.pos=G.prev;L('Побег с большим отрывом: голем ушёл в прошлую комнату. Монстры остались в комнате с прежним HP.','ok')}
+   else{L('Побег с малым отрывом (меньше 3): голем вырвался из ближнего боя, но остался в комнате.','ok');shots(B)}
    return ui()}}
  else{const df=m[k]+(k==='p'&&m.sh?1:0),dm=eff(k),ok=x+dm>y+df;
   LR('Голем',k,x,dm,y,df,ok,dm);
   if(ok){FX('eh',dm);m.hp-=dm;if(m.hp<=0){G.gp+=m.c;L(`${m.n} разрушен: +${m.c} очк. добра.`);B.mons.shift();m.hp=m.mx;G.eDis.push(m);
    if(!B.mons.length){G.tmp={p:0,m:0,a:0};G.B=null;L('Бой выигран.');if(B.amb)clear(B.rm);return ui()}}}}
  mTurn();ui()}
+function shots(B){
+ for(const m of B.mons){if(m.r<2||G.over)continue;const x=d6(),y=d6(),dm=eff('p'),ok=x+m.p>y+dm;
+  L(`${m.n} стреляет вдогонку: `+(ok?`попал, урон ${m.p}.`:'мимо.'),ok?'bad':'miss',`Физ ${x}+${m.p}=${x+m.p} против ${y}+${dm}=${y+dm}.`);
+  if(ok){FX('gh',m.p);G.hp-=m.p;if(G.hp<=0){G.hp=0;G.over='lose'}}}
+ if(rng()>=2&&!G.over&&B.mons.length){const f=B.mons[0],k=(eff('m')-f.m>eff('p')-f.p)?'m':'p',dm=eff(k),df=f[k]+(k==='p'&&f.sh?1:0),x=d6(),y=d6(),ok=x+dm>y+df;
+  L('Твой выстрел вдогонку: '+(ok?`попал, урон ${dm}.`:'мимо.'),ok?'hit':'miss',`${NS[k]} ${x}+${dm}=${x+dm} против ${y}+${df}=${y+df}.`);
+  if(ok){FX('eh',dm);f.hp-=dm;if(f.hp<=0){G.gp+=f.c;L(`${f.n} разрушен: +${f.c} очк. добра.`);B.mons.shift();f.hp=f.mx;G.eDis.push(f)}}}}
 function play(i){if(G.B||G.over||G.pend||G.ap<1){L('Сейчас карту разыграть нельзя: нужно действие, и не в бою.');return ui()}
  const c=G.hand[i];if(G.gp<c.g){L(`Не хватает очков добра: нужно ${c.g}.`);return ui()}
  if(c.t==='item'){if(cap()+c.cap>3){L('Не хватает груза. Сними предмет.');return ui()}G.eq.push(c);if(c.hp){G.mx+=c.hp;G.hp+=c.hp}L('Установлено: '+c.n+'.')}
@@ -162,7 +172,7 @@ function drop(i){const c=G.hand.splice(i,1)[0];G.dn++;if(c.t==='mon'){G.evil.uns
 function done(){if(!G.disc||(G.dn<G.need&&G.hand.length))return;G.disc=0;fin()}
 function fin(){const old=[...G.hand];drawUp();const nw=G.hand.filter(c=>!old.includes(c));
  L(nw.length?`Добор до 5 карт: ${nw.map(c=>c.n).join(', ')}.`:'Рука уже полная, добирать нечего.','ok');
- G.turn++;newTurn();ui()}
+ G.turn++;newTurn();const cr=G.map[key(...G.pos)];if(!G.over&&cr.mons.length&&!G.B){L('Монстры в комнате настигли голема.','bad');G.B={rm:cr,mons:cr.mons,amb:1};mTurn()}ui()}
 function ui(){const A=document.getElementById('app');const fx=G?G.fx:null;if(G)G.fx=null;
  if(!G){const left=5-AL.reduce((x,y)=>x+y,0),
  rows=[['Физ','Бьёшь физикой и защищаешься от ударов монстров (пока все они бьют физикой).','Монстры бьют по тебе физикой, защита будет слабой.'],
@@ -188,11 +198,11 @@ function ui(){const A=document.getElementById('app');const fx=G?G.fx:null;if(G)G
  const fG=fx?(fx.gh?fl('-'+fx.gh):'')+(fx.heal?fl('+'+fx.heal,'g'):''):'',fE=fx&&fx.eh?fl('-'+fx.eh):'';
  const tu=T.on?`<div class="box tut"><p class="mut">Обучение, шаг ${T.i+1} из ${TS.length}</p><p>${TS[T.i].t}</p><button onclick="tn()">${T.i+1<TS.length?'Дальше':'Играть'}</button> <button onclick="tn(1)">Пропустить</button></div>`:'<p><button onclick="T={on:1,i:0};ui()">Обучение</button></p>';
  let bt='<p class="mut">Врага нет. Он появится при засаде или призыве.</p>';
- if(G.B){const m=G.B.mons,f=m[0];bt=`<p><b>${f.n}</b><br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}${f.sh?'<br>Щит: +1 к защите от физ.':''}</p>${m.length>1?`<p class="mut">Следом: ${m.slice(1).map(x=>x.n).join(', ')}.</p>`:''}<div class="acts"><button onclick="act('p')">Бить физикой (${eff('p')})</button><button onclick="act('m')">Бить магией (${eff('m')})</button><button onclick="act('a')">Бежать (${eff('a')})</button></div>`}
+ if(G.B){const m=G.B.mons,f=m[0];bt=`<p><b>${f.n}</b><br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}, дальность ${f.r}${f.sh?'<br>Щит: +1 к защите от физ.':''}</p>${m.length>1?`<p class="mut">Следом: ${m.slice(1).map(x=>x.n).join(', ')}.</p>`:''}<div class="acts"><button onclick="act('p')">Бить физикой (${eff('p')})</button><button onclick="act('m')">Бить магией (${eff('m')})</button><button onclick="act('a')">Бежать (${eff('a')})</button></div><p class="mut">Побег: выиграл на 3 и больше, и ты в прошлой комнате. Меньше: остался здесь, но дальнобойные монстры (дальность 2) стреляют вдогонку.</p>`}
  
- const hand=G.disc?G.hand.map((c,i)=>`<button class="hc" onclick="drop(${i})"><b>${c.n}</b> ${c.t==='mon'?'зло '+c.c:'добро '+c.g}<small>Нажми, чтобы сбросить</small></button>`).join(''):G.hand.map((c,i)=>c.t==='mon'?`<button class="hc mon" onclick="summon(${i})" ${G.B||G.pend||G.ap<1||G.ep<c.c?'disabled':''}><b>${c.n}</b> зло ${c.c}<small>Призвать и напасть первым</small></button>`:`<button class="hc" onclick="play(${i})" ${G.B||G.pend||G.ap<1?'disabled':''}><b>${c.n}</b> добро ${c.g}${c.cap?`, груз ${c.cap}`:''}<small>${c.e}</small></button>`).join('');
+ const hand=G.disc?G.hand.map((c,i)=>`<button class="hc" onclick="drop(${i})"><b>${c.n}</b> ${c.t==='mon'?'зло '+c.c:'добро '+c.g}<small>Нажми, чтобы сбросить</small></button>`).join(''):G.hand.map((c,i)=>c.t==='mon'?`<button class="hc mon" onclick="summon(${i})" ${G.B||G.pend||G.ap<1||G.ep<c.c?'disabled':''}><b>${c.n}</b> зло ${c.c}<small>Дальность ${c.r}. Призвать и напасть первым</small></button>`:`<button class="hc" onclick="play(${i})" ${G.B||G.pend||G.ap<1?'disabled':''}><b>${c.n}</b> добро ${c.g}${c.cap?`, груз ${c.cap}`:''}<small>${c.e}</small></button>`).join('');
  const eq=G.eq.length?G.eq.map((c,j)=>`<p>${c.n} (${c.e}, груз ${c.cap}) <button onclick="unq(${j})" ${G.B?'disabled':''}>Снять</button></p>`).join(''):'<p class="mut">Предметов нет.</p>';
  const hint=G.pend?`Вытянуто: ${NM[G.pend.t].toLowerCase()}${G.pend.e?`, зло ${G.pend.e}`:''}. Нажми «+» рядом с любой комнатой.`:G.B?'Идёт бой.':'Нажми на соседнюю комнату, чтобы перейти.';
- A.innerHTML=`${tu}<div class="grid"><section class="box w-hand${hl('w-hand')}"><h2>Рука</h2>${G.disc?`<p class="warn">Конец хода. Сбрось минимум ${G.need} (сброшено: ${G.dn}). Добро уйдёт в сброс, монстры вернутся в логово. Потом рука добавится до 5 карт.</p><p><button onclick="done()" ${G.dn<G.need&&G.hand.length?'disabled':''}>Готово</button></p>`:''}${hand||'<p class="mut">Пусто</p>'}</section><section class="box w-char${hl('w-char')}${fx&&fx.gh?' flash':''}"><h2>Карта персонажа</h2><p><b>HP ${G.hp}/${G.mx}</b></p><p>${st}</p><p>Груз ${cap()}/3. Добро ${G.gp}, зло ${G.ep}.</p><p><b>Действий: ${G.ap}</b></p><p class="${G.good.length<=3?'warn':''}">Карт добра: ${G.good.length}.</p><p class="${G.dun.length<=3?'warn':''}">Комнат в колоде: ${G.dun.length}${G.dun.length<=3?'. Когда они кончатся, а выход не найден, ты проиграешь.':''} <span class="mut">Ход ${G.turn}.</span></p>${fG}</section><section class="box w-items${hl('w-items')}"><h2>Предметы</h2>${eq}</section><section class="box w-enemy${fx&&fx.eh?' shake':''}"><h2>Враг</h2>${dc}${bt}${fE}</section><section class="box w-field${hl('w-field')}"><h2>Поле</h2><p class="mut">${hint}</p><div class="map" style="grid-template-columns:repeat(${x1-x0+1},64px)">${cells}</div><p><button onclick="endTurn()" ${G.B||G.pend||G.disc?'disabled':''}>Завершить ход</button></p></section><section class="box w-log${hl('w-log')}"><h2>История</h2>${lg}</section></div>`}
+ A.innerHTML=`${tu}<div class="grid"><section class="box w-hand${hl('w-hand')}"><h2>Рука</h2>${G.disc?`<p class="warn">Конец хода. Сбрось минимум ${G.need} (сброшено: ${G.dn}). Добро уйдёт в сброс, монстры вернутся в логово. Потом рука добавится до 5 карт.</p><p><button onclick="done()" ${G.dn<G.need&&G.hand.length?'disabled':''}>Готово</button></p>`:''}${hand||'<p class="mut">Пусто</p>'}</section><section class="box w-char${hl('w-char')}${fx&&fx.gh?' flash':''}"><h2>Карта персонажа</h2><p><b>HP ${G.hp}/${G.mx}</b></p><p>${st}</p><p>Груз ${cap()}/3. Дальность ${rng()}. Добро ${G.gp}, зло ${G.ep}.</p><p><b>Действий: ${G.ap}</b></p><p class="${G.good.length<=3?'warn':''}">Карт добра: ${G.good.length}.</p><p class="${G.dun.length<=3?'warn':''}">Комнат в колоде: ${G.dun.length}${G.dun.length<=3?'. Когда они кончатся, а выход не найден, ты проиграешь.':''} <span class="mut">Ход ${G.turn}.</span></p>${fG}</section><section class="box w-items${hl('w-items')}"><h2>Предметы</h2>${eq}</section><section class="box w-enemy${hl('w-enemy')}${fx&&fx.eh?' shake':''}"><h2>Враг</h2>${dc}${bt}${fE}</section><section class="box w-field${hl('w-field')}"><h2>Поле</h2><p class="mut">${hint}</p><div class="map" style="grid-template-columns:repeat(${x1-x0+1},64px)">${cells}</div><p><button onclick="endTurn()" ${G.B||G.pend||G.disc?'disabled':''}>Завершить ход</button></p></section><section class="box w-log${hl('w-log')}"><h2>История</h2>${lg}</section></div>`}
 ui();
 </script></body></html>
