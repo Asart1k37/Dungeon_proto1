@@ -1,264 +1,1057 @@
 <!doctype html>
-<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Голем в подземелье</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=VT323&family=Spectral:wght@400;600&display=swap">
-<style>
-:root{color-scheme:light;--bg:#f5f7fa;--ink:#2a2d34;--mut:#667085;--line:#cddcf0;--mg:#e59a9a;--card:#ffffffd9;--bd:#98a2b3;--red:#b3261e;--blue:#2f55a4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1d2026;--ink:#e6e8ec;--mut:#9aa1ad;--line:#2b323e;--mg:#7a3a3a;--card:#262a32d9;--bd:#5a6372;--red:#ff8a80;--blue:#8fb0ff}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#1d2026;--ink:#e6e8ec;--mut:#9aa1ad;--line:#2b323e;--mg:#7a3a3a;--card:#262a32d9;--bd:#5a6372;--red:#ff8a80;--blue:#8fb0ff}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:repeating-linear-gradient(transparent 0 27px,var(--line) 27px 28px),var(--bg);color:var(--ink);font:17px/28px Spectral,Georgia,serif}
-body::before{content:"";position:fixed;inset:0 auto 0 38px;width:2px;background:var(--mg)}
-main{max-width:1180px;margin:0 auto;padding:8px 14px 48px 54px}
-h1{font:600 46px/52px Caveat,cursive;margin:12px 0 0}
-p{margin:6px 0}
-.box{border:1.5px solid var(--bd);border-radius:6px 14px 8px 12px;background:var(--card);padding:8px 14px;margin:14px 0}
-button{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--bd);border-radius:6px 12px 7px 10px;padding:4px 12px;cursor:pointer;min-height:40px}
-button:hover:not(:disabled){border-color:var(--blue)}
-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-button:disabled{opacity:.5;cursor:default}
-.cards{display:flex;flex-wrap:wrap;gap:10px}
-.card{width:158px;text-align:left;font-size:15px;line-height:20px;padding:8px 10px}
-.card b{display:block;font:600 23px/24px Caveat,cursive}
-.mon{border-style:dashed}
-.warn{color:var(--red)}
-.mut{color:var(--mut);font-size:15px}
-.map{display:grid;gap:6px;overflow-x:auto;padding:4px}
-.cell{width:64px;height:64px;padding:2px;font-size:13px;line-height:15px;text-align:center;min-height:0}
-.cell:disabled{opacity:.85}
-.here{border:2.5px solid var(--blue)}
-.free{border-style:dashed;font-size:26px}
-.seen{background:transparent}
-ul{margin:4px 0;padding-left:20px}
+<html lang="ru" data-theme="dark">
 
-.box{position:relative}
-.lg{list-style:none;padding:0}.lg li{padding:2px 8px;border-left:4px solid var(--bd);margin:0 0 6px;line-height:20px;font-size:15px}
-.lg li:first-child{background:var(--card)}.lg .hit{border-color:#2f9e63}.lg .bad{border-color:#e5484d}.lg .miss{color:var(--mut)}.lg .ok{border-color:var(--blue)}
-.lg small{color:var(--mut);font-size:13px;line-height:16px}
-.hl{outline:3px solid var(--blue);outline-offset:3px}
-.tut{margin:0 0 12px}
-.die{display:inline-grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--ink);border-radius:7px;font:600 20px/1 Spectral,Georgia,serif;background:var(--card)}
-.dice{margin:0 0 8px}
-@keyframes flash{0%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 18px 4px #e5484d;border-color:#e5484d}100%{box-shadow:0 0 0 0 transparent}}
-@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@keyframes up{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-36px)}}
-@keyframes roll{from{transform:rotate(-360deg) scale(.4);opacity:.2}to{transform:none;opacity:1}}
-.flash{animation:flash .8s}.shake{animation:shake .3s}
-.fl{position:absolute;right:14px;top:6px;font:600 34px/1 Caveat,cursive;color:#e5484d;animation:up 1.1s forwards;pointer-events:none}.fl.g{color:#2f9e63}
-.anim .die{animation:roll .45s}
-@media (prefers-reduced-motion:reduce){.flash,.shake,.anim .die{animation:none}.fl{display:none}}
-details{margin:8px 0}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Голем в подземелье</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=VT323&family=Spectral:wght@400;600&display=swap">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --ink: #2a2d34;
+      --mut: #667085;
+      --line: #cddcf0;
+      --mg: #e59a9a;
+      --card: #ffffffd9;
+      --bd: #98a2b3;
+      --red: #b3261e;
+      --blue: #2f55a4;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
 
-.grid{display:grid;gap:12px;grid-template-columns:1fr 1.5fr 1fr;grid-template-areas:"hand char items" "enemy field log"}
-.grid .box{margin:0}
-.w-hand{grid-area:hand}.w-char{grid-area:char}.w-items{grid-area:items}.w-enemy{grid-area:enemy}.w-field{grid-area:field}.w-log{grid-area:log}
-h2{font:600 26px/28px Caveat,cursive;margin:0 0 4px}
-.hc{display:block;width:100%;text-align:left;margin:0 0 6px;font-size:15px;line-height:20px;min-height:0;padding:4px 8px}
-.hc small{display:block;color:var(--mut);font-size:13px;line-height:16px}
-.acts button{display:block;width:100%;margin:6px 0}
-@media (max-width:860px){.grid{grid-template-columns:1fr;grid-template-areas:"char" "field" "enemy" "hand" "items" "log"}}
-.al{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border-bottom:1px dashed var(--bd)}
-.alc{display:flex;align-items:center;gap:10px;flex:none}.alc button{min-width:42px}
-.alv{font:600 30px/1 Caveat,cursive;min-width:22px;text-align:center}
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #1d2026;
+        --ink: #e6e8ec;
+        --mut: #9aa1ad;
+        --line: #2b323e;
+        --mg: #7a3a3a;
+        --card: #262a32d9;
+        --bd: #5a6372;
+        --red: #ff8a80;
+        --blue: #8fb0ff
+      }
+    }
 
-:root[data-theme="dark"]{--bg:#0b0912;--ink:#e9e6ff;--mut:#9a93c9;--line:#0000;--mg:#0000;--card:#14112299;--bd:#7a3cff;--red:#ff4d8d;--blue:#05d9e8}
-html{background:#0b0912}
-body{background:radial-gradient(900px 520px at 12% 8%,#ff2a6d38,transparent 62%),radial-gradient(1000px 620px at 92% 18%,#05d9e830,transparent 60%),radial-gradient(1200px 700px at 50% 120%,#7a3cff40,transparent 60%),#0b0912;font:21px/24px 'VT323','Courier New',monospace;padding:6px 0 40px}
-body::before{content:"";position:fixed;inset:0;width:auto;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000038 2px 3px);pointer-events:none;z-index:10}
-body::after{content:"";position:fixed;inset:0;opacity:.11;pointer-events:none;z-index:11;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
-main{position:relative;max-width:1180px;margin:22px auto;padding:14px 18px 30px;border:10px solid #1c1834;border-radius:22px;background:#0f0d1a;box-shadow:0 0 0 2px #05d9e866,0 0 60px #7a3cff66,0 0 150px #ff2a6d33,inset 0 0 70px #000}
-h1{font:600 52px/56px Caveat,cursive;color:#fff;text-shadow:0 0 8px #ff2a6d,0 0 22px #ff2a6d,0 0 40px #7a3cff}
-h2{font:21px/24px 'VT323',monospace}
-.box{border:2px solid var(--bd);border-radius:3px;background:#14112299;box-shadow:0 0 14px #7a3cff55}
-.box h2{margin:-8px -14px 8px;padding:2px 10px;background:linear-gradient(90deg,#7a3cff,#ff2a6d);color:#fff;text-transform:uppercase;letter-spacing:.08em;text-shadow:0 0 6px #0008}
-button{font-family:inherit;font-size:19px;border:2px solid var(--blue);border-radius:2px;background:#0b0912;color:var(--blue);text-transform:uppercase;letter-spacing:.04em}
-button:hover:not(:disabled){box-shadow:0 0 12px var(--blue);background:#05d9e81a}
-button:disabled{border-color:#4b4575;color:#6f69a0}
-.card b,.hc b{font-family:'VT323',monospace;font-size:22px}
-.cell{border-radius:2px;background:#1a1630;font-size:15px;line-height:14px}
-.cell.seen{background:#221c40}
-.here{border:2px solid #ffd319;box-shadow:0 0 14px #ffd319}
-.free{border-color:#ff2a6d;color:#ff2a6d}
-.die{border:2px solid #05d9e8;color:#05d9e8;background:#0b0912;box-shadow:0 0 10px #05d9e866;font-family:'VT323',monospace}
-.lg li:first-child{background:#1a1630}
-.hl{outline:3px solid #ffd319}
-.warn{color:#ff4d8d}
-main::before{content:"ЗАМЕТКА: металл на исходе, заказать у поставщика";position:absolute;right:26px;top:-26px;width:190px;padding:8px 10px;transform:rotate(3deg);background:#ffd319;color:#241a00;font:600 22px/22px Caveat,cursive;box-shadow:4px 6px 0 #0006;z-index:5;pointer-events:none}
-main::after{content:"голем v3: проверить ловкость, скетчи монстров";position:absolute;left:22px;bottom:-30px;width:210px;padding:8px 10px 8px 26px;transform:rotate(-3deg);color:#222;font:600 21px/22px Caveat,cursive;background:repeating-linear-gradient(#f3f4f8 0 21px,#9db6e0 21px 22px);box-shadow:4px 6px 0 #0006;clip-path:polygon(0 0,100% 4%,98% 100%,3% 96%);z-index:5;pointer-events:none}
-@media (max-width:760px){main::before,main::after{display:none}main{margin:8px;padding:10px}}
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #1d2026;
+      --ink: #e6e8ec;
+      --mut: #9aa1ad;
+      --line: #2b323e;
+      --mg: #7a3a3a;
+      --card: #262a32d9;
+      --bd: #5a6372;
+      --red: #ff8a80;
+      --blue: #8fb0ff
+    }
 
-.warn-sign{display:inline-block;position:relative;margin:14px 0 22px;padding:6px 20px 6px 62px;font:400 38px/40px 'VT323','Courier New',monospace;text-transform:uppercase;letter-spacing:.12em;color:#ffd319;background:#0b0912;border:2px solid #ffd319;text-shadow:0 0 8px #ffd319aa;box-shadow:0 0 16px #ffd31966,inset 0 0 12px #ffd31933}
-.warn-sign::before{content:"!";position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:32px;display:grid;place-items:end center;background:#ffd319;color:#0b0912;font:700 26px/1 'VT323',monospace;clip-path:polygon(50% 0,100% 100%,0 100%);text-shadow:none}
-.warn-sign::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-14px;height:9px;background:repeating-linear-gradient(-45deg,#ffd319 0 10px,#0b0912 10px 20px)}
-.warn-sign.lose{color:#ff4d8d;border-color:#ff4d8d;text-shadow:0 0 8px #ff2a6d,0 0 22px #ff2a6d;box-shadow:0 0 20px #ff2a6d88,inset 0 0 14px #ff2a6d44;animation:flick 3s infinite}
-.warn-sign.lose::before{background:#ff4d8d}
-.warn-sign.lose::after{background:repeating-linear-gradient(-45deg,#ff4d8d 0 10px,#0b0912 10px 20px)}
-.warn-sign.win{color:#05d9e8;border-color:#05d9e8;text-shadow:0 0 8px #05d9e8;box-shadow:0 0 18px #05d9e888,inset 0 0 12px #05d9e833}
-.warn-sign.win::before{background:#05d9e8}
-.warn-sign.win::after{background:repeating-linear-gradient(-45deg,#05d9e8 0 10px,#0b0912 10px 20px)}
-@keyframes flick{0%,90%,100%{opacity:1}92%{opacity:.35}94%{opacity:1}97%{opacity:.55}}
-@media (prefers-reduced-motion:reduce){.warn-sign.lose{animation:none}}
-@media (max-width:760px){.warn-sign{font-size:26px;line-height:28px;letter-spacing:.06em;padding:4px 12px 4px 50px}.warn-sign::before{width:30px;height:27px;font-size:21px}}
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
 
-.map{position:relative}
-.cell.here{display:flex;justify-content:center;align-items:flex-start;text-align:center}
-.gsp{position:absolute;width:36px;height:48px;background:url(golem-run.png) 0 -8px/512px 64px no-repeat;image-rendering:pixelated;pointer-events:none;z-index:3;filter:drop-shadow(0 0 6px #05d9e8aa)}
-.gsp.r{transform:scaleX(-1)}
-.gsp.idle{background-position-x:-168px;animation:gidle 1s steps(2) infinite}
-.gsp.run{animation:gwalk .5s linear forwards,grun .25s steps(4) 2,gidle 1s steps(2) .5s infinite}
-@keyframes gwalk{from{left:var(--fx);top:var(--fy)}to{left:var(--tx);top:var(--ty)}}
-@keyframes grun{from{background-position-x:0}to{background-position-x:-168px}}
-@keyframes gidle{from{background-position-x:-168px}to{background-position-x:-252px}}
-@media (prefers-reduced-motion:reduce){.gsp{animation:none!important}.gsp.run{background-position-x:-168px}}
-</style></head><body><main>
-<h1 id="ttl" class="warn-sign">Голем в подземелье</h1>
-<p class="mut">Прототип, этаж 1. Скетчи пока заменены подписями.</p>
-<details><summary>Правила в двух словах</summary>
-<ul><li>Перед стартом распределяешь 5 очков между физом, магом и ловкостью (максимум 3 в одном).</li><li>Каждый ход ты тянешь комнату вслепую и ставишь её в свободную клетку рядом с любой выложенной комнатой.</li>
-<li>Потом у тебя 2 действия: разыграть карту (добро за очки добра) или перейти в соседнюю комнату. Призвать монстра из руки за очки зла тоже стоит действие.</li>
-<li>Новая комната: бросок d6. Больше очков зла комнаты — засады нет, иначе нападают монстры на сумму не больше этого зла. Вход даёт очки зла, равные злу комнаты.</li>
-<li>Бой: d6 плюс стат против d6 плюс тот же стат защитника. Побеждает атакующий, если сумма больше, урон равен стату.</li>
-<li>Побег бросается на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку (и ты тоже, если есть предмет на дальность). Оставшиеся монстры настигают тебя в начале следующего хода.</li><li>За убитого монстра получаешь очки добра, равные его цене. Предметы занимают груз (всего 3).</li>
-<li>Когда заканчиваешь ход, нужно сбросить минимум одну карту по своему выбору (если в руке больше 5, то столько, чтобы осталось 5). Добро уходит в сброс, монстры возвращаются в логово. Потом рука добирается до 5 карт.</li><li>Выход лежит в нижней части колоды. Вход в него заканчивает этаж. Комнаты в колоде конечны: если они кончились, а выход не найден, этаж проигран.</li></ul></details>
-<div id="app"></div><p class="mut">Нашёл странность или есть идея? Расскажи тому, кто прислал ссылку: именно для этого прототип и нужен.</p></main>
-<script>
-const r=n=>Math.floor(Math.random()*n),d6=()=>1+r(6),sh=a=>{for(let i=a.length-1;i>0;i--){const j=r(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
-const MON={gob:{n:'Гоблин',r:1,c:1,hp:3,p:1,m:1,a:2},arb:{n:'Гоблин с арбалетом',r:2,c:2,hp:3,p:2,m:1,a:1},ske:{n:'Скелет',r:1,c:2,hp:4,p:2,m:1,a:1},spe:{n:'Скелет-копейщик',r:2,c:3,hp:4,p:3,m:1,a:0},zom:{n:'Зомби',r:1,c:2,hp:6,p:2,m:1,a:0},shd:{n:'Зомби со щитом',r:1,c:3,hp:7,p:2,m:1,a:1,sh:1}};
-const IT={pl:{n:'Стальные пластины',cap:2,g:1,p:1,e:'+1 физ'},le:{n:'Кристалл-линза',cap:2,g:1,m:1,e:'+1 маг'},sp:{n:'Пружинные сочленения',cap:1,g:1,a:1,e:'+1 ловк'},rg:{n:'Манипулятор-удлинитель',cap:1,g:1,r:1,e:'+1 дальность'},tk:{n:'Запасной бак',cap:1,g:1,hp:2,e:'+2 HP'},ar:{n:'Бронеплита',cap:3,g:2,hp:3,e:'+3 HP'}};
-const SP={rep:{n:'Ремонт',g:1,e:'+3 HP сейчас'},ov:{n:'Перегрузка',g:1,p:2,e:'+2 физ до конца боя'},fo:{n:'Фокус',g:1,m:2,e:'+2 маг до конца боя'},lu:{n:'Смазка',g:1,a:2,e:'+2 ловк до конца боя'}};
-const BUILDS=[{n:'Силач',s:[3,1,1]},{n:'Маг',s:[1,3,1]},{n:'Универсал',s:[2,2,1]}];
-const NM={start:'Вход',norm:'Комната',rest:'Комната отдыха',loot:'Комната с добычей',exit:'Выход с этажа'};
-const D=[[1,0],[-1,0],[0,1],[0,-1]],key=(x,y)=>x+','+y;
-let G=null,AL=[2,2,1];
-function al(i,d){const n=AL[i]+d;if(n<0||n>3||AL.reduce((x,y)=>x+y,0)+d>5)return;AL[i]=n;ui()}
-function pre(i){AL=[...BUILDS[i].s];ui()}
-const L=(a,c='sys',b='')=>G.log.unshift({a,c,b});
-const FX=(k,v)=>{G.fx=G.fx||{};G.fx[k]=v};
-const NS={p:'Физ',m:'Маг',a:'Ловк'};
-function LR(who,k,x,as,y,df,ok,dmg){const n=G.B.n=(G.B.n||0)+1,g=who==='Голем';G.last={who,x,as,y,df,ok};
- L(ok?(g?`Попадание: ${dmg} урона`:`${who} попал: ${dmg} урона`):(g?'Промах: 0 урона':`${who} промахнулся: 0 урона`),ok?(g?'hit':'bad'):'miss',`${n}. ${who}: Атака (${NS[k]}) ${x}+${as}=${x+as}, защита ${y}+${df}=${y+df}.`+(ok?` Урон равен стату атаки (${as}).`:''))}
-function LE(x,as,y,df,ok){L(ok?'Побег: удался':'Побег: не вышел',ok?'ok':'miss',`Ловк ${x}+${as}=${x+as} против ${y}+${df}=${y+df}.`)}
-function LC(q,e,extra){const ok=q>e;G.last={entry:1,q,e};L(`Вход: проверка ${q} (нужно больше ${e}). `+(ok?'Успех!':'Провал!'),ok?'ok':'bad',ok?'Засады нет.':'Засада: '+(extra||''))}
-const TS=[{s:'w-field',t:'Каждый ход начинается с комнаты, вытянутой вслепую. Нажми «+» рядом с любой комнатой, чтобы поставить её туда.'},
-{s:'w-char',t:'У тебя 2 действия за ход. Действие это переход в соседнюю комнату или розыгрыш карты. Физ и маг дают урон, ловкость нужна для побега.'},
-{s:'w-field',t:'Нажми на соседнюю комнату, чтобы перейти в неё. В новой комнате бросается d6: если выпало больше числа зла комнаты, засады нет.'},
-{s:'w-log',t:'Здесь записан каждый бросок: кубик плюс стат нападающего против кубика плюс тот же стат защищающегося. Если сумма нападающего больше, он попал, а урон равен стату его атаки.'},
-{s:'w-enemy',t:'Побег решается тем же броском на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку. Предмет на дальность даст выстрел в ответ.'},
-{s:'w-hand',t:'Карты добра стоят очки добра, а их дают за убитых монстров. Монстров из руки можно призвать за очки зла, которые даёт вход в новую комнату. В конце каждого хода нужно сбросить минимум одну карту, а потом рука добирается до 5.'},
-{s:'w-items',t:'Предметы занимают груз (всего 3) и дают постоянные бонусы. Снятый предмет уходит в сброс. Цель этажа: найти выход, он лежит в нижней части колоды. Комнаты в колоде конечны: если они закончатся до выхода, ты проиграешь.'}];
-let T={on:1,i:0};try{if(localStorage.getItem('gt'))T.on=0}catch(e){}
-function tn(sk){if(sk||T.i+1>=TS.length){T.on=0;try{localStorage.setItem('gt','1')}catch(e){}}else T.i++;ui()}
-const eff=k=>G.s[k]+G.tmp[k]+G.eq.reduce((x,i)=>x+(i[k]||0),0);
-const rng=()=>1+G.eq.reduce((x,i)=>x+(i.r||0),0);
-const cap=()=>G.eq.reduce((x,i)=>x+i.cap,0);
-const rs=()=>{if(!G.evil.length&&G.eDis.length){G.evil=sh(G.eDis);G.eDis=[]}};
-const lab=rm=>rm.t==='start'?'Вход':rm.t==='norm'?'Зло '+rm.e:rm.t==='rest'?'Отдых':rm.t==='loot'?'Лут, зло '+rm.e:'Выход';
-function go(b){
- const it=['pl','pl','le','sp','rg','tk','ar'].map(k=>({t:'item',k,...IT[k]}));
- const spl=['rep','rep','rep','ov','ov','fo','fo','lu'].map(k=>({t:'spell',k,...SP[k]}));
- const d=sh([...[1,1,1,2,2,2,3,3].map(e=>({t:'norm',e})),{t:'rest'},{t:'rest'},{t:'loot',e:4},{t:'loot',e:4}]);
- d.forEach(x=>x.mons=[]);d.splice(r(5),0,{t:'exit',mons:[]});
- const ev=[];for(const k in MON)for(let i=0;i<2;i++)ev.push({t:'mon',k,...MON[k],mx:MON[k].hp});
- G={hp:8,mx:8,s:{p:b[0],m:b[1],a:b[2]},eq:[],tmp:{p:0,m:0,a:0},gp:2,ep:0,ap:2,good:sh([...it,...spl]),evil:sh(ev),eDis:[],gDis:[],dun:d,map:{'0,0':{t:'start',e:0,vis:1,mons:[]}},pos:[0,0],prev:[0,0],pend:null,hand:[],B:null,log:[],over:null,turn:1};
- drawUp();newTurn();ui()}
-function newTurn(){G.ap=2;if(!G.dun.length){G.over='lose';return}G.pend=G.dun.pop();L(`Ход ${G.turn}. Вытянута комната: ${NM[G.pend.t].toLowerCase()}${G.pend.e?`, зло ${G.pend.e}`:''}. Выбери клетку.`);if(G.dun.length<=3)L(`Осталось комнат: ${G.dun.length}. Когда они кончатся, а выход не найден, ты проиграешь.`,'bad')}
-function drawUp(){while(G.hand.length<5){rs();const pg=G.good.length,pe=G.evil.length;if(!pg&&!pe)break;G.hand.push((pg&&(!pe||r(2)))?G.good.pop():G.evil.pop())}}
-function place(x,y){if(!G.pend)return;G.map[key(x,y)]=G.pend;G.pend=null;L('Комната выложена. У тебя 2 действия.');ui()}
-function pick(E){rs();const out=[];let rem=E;
- for(let i=0;i<4;i++){const pool=[...G.hand.filter(c=>c.t==='mon'),...G.evil.slice(-3)].filter(c=>c.c<=rem);if(!pool.length)break;
-  const mx=Math.max(...pool.map(c=>c.c)),o=pool.filter(c=>c.c===mx),c=o[r(o.length)],a=G.hand.indexOf(c);
-  if(a>=0)G.hand.splice(a,1);else G.evil.splice(G.evil.indexOf(c),1);out.push(c);rem-=c.c}
- return out}
-function clear(rm){if(rm.t==='loot'&&!rm.lt){rm.lt=1;const got=[];for(let i=0;i<2&&G.good.length;i++){const c=G.good.pop();G.hand.push(c);got.push(c.n)}L('Добыча: '+(got.join(', ')||'ничего, колода добра пуста')+'.')}}
-function move(x,y){if(G.B||G.pend||G.ap<1||G.over)return;const rm=G.map[key(x,y)];if(!rm)return;
- if(typeof window!=='undefined'){if(Date.now()-(G.mv||0)<450)return;G.mv=Date.now()}
- G.ap--;{const dx=x-G.pos[0];if(dx)G.face=dx>0?'r':'l'}G.mvfx={f:[...G.pos]};G.prev=G.pos;G.pos=[x,y];const first=!rm.vis;rm.vis=1;
- if(rm.t==='exit'){G.over='win';return ui()}
- if(rm.t==='rest'){if(first){G.hp=Math.min(G.mx,G.hp+3);L('Комната отдыха: +3 HP.','ok');FX('heal',3)}else L('Комната отдыха уже использована.');return ui()}
- if(first){G.ep+=rm.e;L(`Новая комната (зло ${rm.e}): +${rm.e} очк. зла.`)}
- if(rm.mons.length){L('Оставшиеся монстры нападают.');G.B={rm,mons:rm.mons,amb:1};mTurn();return ui()}
- if(first){const q=d6();
-  if(q>rm.e){LC(q,rm.e);clear(rm)}
-  else{rm.mons=pick(rm.e);if(!rm.mons.length){LC(q,rm.e,'монстров не нашлось');clear(rm)}
-   else{LC(q,rm.e,rm.mons.map(m=>m.n).join(', '));G.B={rm,mons:rm.mons,amb:1};mTurn()}}}
- ui()}
-function summon(i){if(G.B||G.pend||G.ap<1||G.over)return;const c=G.hand[i],rm=G.map[key(...G.pos)];
- if(rm.t==='rest'){L('В комнате отдыха призывать нельзя.');return ui()}
- if(G.ep<c.c){L(`Не хватает очков зла: нужно ${c.c}.`);return ui()}
- G.ep-=c.c;G.ap--;G.hand.splice(i,1);G.B={rm,mons:[c],amb:0};L(`Ты призвал: ${c.n}. Нападаешь первым.`);ui()}
-function mTurn(){const m=G.B.mons[0],x=d6(),y=d6(),dm=eff('p'),ok=x+m.p>y+dm;
- LR(m.n,'p',x,m.p,y,dm,ok,m.p);
- if(ok){FX('gh',m.p);G.hp-=m.p;if(G.hp<=0){G.hp=0;G.over='lose'}}}
-function act(k){const B=G.B;if(!B||G.over)return;const m=B.mons[0],x=d6(),y=d6();
- if(k==='a'){const mg=x+eff('a')-y-m.a,ok=mg>0;LE(x,eff('a'),y,m.a,ok);
-  if(ok){G.tmp={p:0,m:0,a:0};G.B=null;
-   if(!B.amb){G.evil.unshift(...B.mons.map(c=>(c.hp=c.mx,c)));L('Призванный монстр вернулся в логово.')}
-   else if(mg>=3){{const dx=G.prev[0]-G.pos[0];if(dx)G.face=dx>0?'r':'l'}G.mvfx={f:[...G.pos]};G.pos=G.prev;L('Побег с большим отрывом: голем ушёл в прошлую комнату. Монстры остались в комнате с прежним HP.','ok')}
-   else{L('Побег с малым отрывом (меньше 3): голем вырвался из ближнего боя, но остался в комнате.','ok');shots(B)}
-   return ui()}}
- else{const df=m[k]+(k==='p'&&m.sh?1:0),dm=eff(k),ok=x+dm>y+df;
-  LR('Голем',k,x,dm,y,df,ok,dm);
-  if(ok){FX('eh',dm);m.hp-=dm;if(m.hp<=0){G.gp+=m.c;L(`${m.n} разрушен: +${m.c} очк. добра.`);B.mons.shift();m.hp=m.mx;G.eDis.push(m);
-   if(!B.mons.length){G.tmp={p:0,m:0,a:0};G.B=null;L('Бой выигран.');if(B.amb)clear(B.rm);return ui()}}}}
- mTurn();ui()}
-function shots(B){
- for(const m of B.mons){if(m.r<2||G.over)continue;const x=d6(),y=d6(),dm=eff('p'),ok=x+m.p>y+dm;
-  L(`${m.n} стреляет вдогонку: `+(ok?`попал, урон ${m.p}.`:'мимо.'),ok?'bad':'miss',`Физ ${x}+${m.p}=${x+m.p} против ${y}+${dm}=${y+dm}.`);
-  if(ok){FX('gh',m.p);G.hp-=m.p;if(G.hp<=0){G.hp=0;G.over='lose'}}}
- if(rng()>=2&&!G.over&&B.mons.length){const f=B.mons[0],k=(eff('m')-f.m>eff('p')-f.p)?'m':'p',dm=eff(k),df=f[k]+(k==='p'&&f.sh?1:0),x=d6(),y=d6(),ok=x+dm>y+df;
-  L('Твой выстрел вдогонку: '+(ok?`попал, урон ${dm}.`:'мимо.'),ok?'hit':'miss',`${NS[k]} ${x}+${dm}=${x+dm} против ${y}+${df}=${y+df}.`);
-  if(ok){FX('eh',dm);f.hp-=dm;if(f.hp<=0){G.gp+=f.c;L(`${f.n} разрушен: +${f.c} очк. добра.`);B.mons.shift();f.hp=f.mx;G.eDis.push(f)}}}}
-function play(i){if(G.B||G.over||G.pend||G.ap<1){L('Сейчас карту разыграть нельзя: нужно действие, и не в бою.');return ui()}
- const c=G.hand[i];if(G.gp<c.g){L(`Не хватает очков добра: нужно ${c.g}.`);return ui()}
- if(c.t==='item'){if(cap()+c.cap>3){L('Не хватает груза. Сними предмет.');return ui()}G.eq.push(c);if(c.hp){G.mx+=c.hp;G.hp+=c.hp}L('Установлено: '+c.n+'.')}
- else{if(c.k==='rep'){G.hp=Math.min(G.mx,G.hp+3);FX('heal',3)}else for(const k of 'pma')G.tmp[k]+=c[k]||0;G.gDis.push(c);L('Заклинание: '+c.n+'.')}
- G.gp-=c.g;G.ap--;G.hand.splice(i,1);ui()}
-function unq(j){if(G.B||G.over)return;const c=G.eq.splice(j,1)[0];if(c.hp){G.mx-=c.hp;G.hp=Math.min(G.hp,G.mx)}G.gDis.push(c);L(c.n+' снят и отправлен в сброс.');ui()}
-function endTurn(){if(G.B||G.pend||G.over||G.disc)return;
- if(!G.hand.length)return fin();
- G.disc=1;G.dn=0;G.need=Math.max(1,G.hand.length-5);
- L(`Конец хода: сбрось минимум ${G.need} ${G.need==1?'карту':G.need<5?'карты':'карт'}.`,'bad');ui()}
-function drop(i){const c=G.hand.splice(i,1)[0];G.dn++;if(c.t==='mon'){G.evil.unshift(c);L(c.n+' вернулся в логово.')}else{G.gDis.push(c);L(c.n+' ушла в сброс.')}ui()}
-function done(){if(!G.disc||(G.dn<G.need&&G.hand.length))return;G.disc=0;fin()}
-function fin(){const old=[...G.hand];drawUp();const nw=G.hand.filter(c=>!old.includes(c));
- L(nw.length?`Добор до 5 карт: ${nw.map(c=>c.n).join(', ')}.`:'Рука уже полная, добирать нечего.','ok');
- G.turn++;newTurn();const cr=G.map[key(...G.pos)];if(!G.over&&cr.mons.length&&!G.B){L('Монстры в комнате настигли голема.','bad');G.B={rm:cr,mons:cr.mons,amb:1};mTurn()}ui()}
-function ui(){const A=document.getElementById('app');
- const ti=document.getElementById('ttl');
- ti.className='warn-sign '+(!G?'st':G.over==='lose'?'lose':G.over==='win'?'win':'play');
- ti.textContent=!G?'Выбор Голема':G.over==='lose'?(G.hp<=0?'Голем разрушен':'Выход не найден'):G.over==='win'?'Этаж пройден':'Голем в подземелье';const fx=G?G.fx:null;if(G)G.fx=null;const mvf=G?G.mvfx:null;if(G)G.mvfx=null;
- if(!G){const left=5-AL.reduce((x,y)=>x+y,0),
- rows=[['Физ','Бьёшь физикой и защищаешься от ударов монстров (пока все они бьют физикой).','Монстры бьют по тебе физикой, защита будет слабой.'],
- ['Маг','Бьёшь магией. Защиты не даёт: монстры пока бьют только физикой.','Магические удары почти всегда будут мимо.'],
- ['Ловк','Нужна для побега. Ударов ловкостью нет.','Побег почти невозможен.']];
- A.innerHTML=`<div class="box"><h2>Распредели 5 очков голема</h2><p class="mut">Максимум 3 в одном стате. HP 8, груз 3, 2 действия за ход.</p>${rows.map((r,i)=>`<div class="al"><div><b>${r[0]}</b><br><small class="mut">${r[1]}</small>${AL[i]==0?`<br><small class="warn">Ноль: ${r[2]}</small>`:''}</div><div class="alc"><button onclick="al(${i},-1)" ${AL[i]<=0?'disabled':''} aria-label="Меньше">−</button><span class="alv">${AL[i]}</span><button onclick="al(${i},1)" ${AL[i]>=3||left<=0?'disabled':''} aria-label="Больше">+</button></div></div>`).join('')}<p><b>Осталось очков: ${left}</b></p><p><button onclick="go(AL)" ${left?'disabled':''}>Начать игру</button></p><p class="mut">Быстрый выбор:</p><div class="cards">${BUILDS.map((b,i)=>`<button class="card" onclick="pre(${i})"><b>${b.n}</b>физ ${b.s[0]}, маг ${b.s[1]}, ловк ${b.s[2]}</button>`).join('')}</div></div>`;return}
- const lg='<ul class="lg">'+G.log.slice(0,12).map(e=>`<li class="${e.c}"><b>${e.a}</b>${e.b?`<br><small>${e.b}</small>`:''}</li>`).join('')+'</ul>';
- if(G.over){A.innerHTML=`<div class="box"><p><b>${G.over==='win'?'Этаж пройден. Голем нашёл выход.':G.hp<=0?'Голем разрушен.':'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over==='lose'&&G.hp>0?'<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>':''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`;return}
- const st=[['p','физ'],['m','маг'],['a','ловк']].map(([k,n])=>`${n} ${eff(k)}${G.tmp[k]?` (+${G.tmp[k]})`:''}`).join(', ');
- const ks=Object.keys(G.map).map(k=>k.split(',').map(Number)),cand=[];
- if(G.pend)for(const [x,y] of ks)for(const [dx,dy] of D){const c=[x+dx,y+dy];if(!G.map[key(...c)]&&!cand.some(q=>q[0]==c[0]&&q[1]==c[1]))cand.push(c)}
- const all=[...ks,...cand],xs=all.map(p=>p[0]),ys=all.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
- let cells='';
- for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const rm=G.map[key(x,y)];
-  if(rm){const here=x==G.pos[0]&&y==G.pos[1],can=Math.abs(x-G.pos[0])+Math.abs(y-G.pos[1])==1&&!G.B&&!G.pend&&!G.disc&&G.ap>0;
-   cells+=`<button class="cell${here?' here':''}${rm.vis?' seen':''}" ${can?`onclick="move(${x},${y})"`:'disabled'}>${lab(rm)}${rm.mons.length?'<br>монстр':''}</button>`}
-  else if(cand.some(c=>c[0]==x&&c[1]==y))cells+=`<button class="cell free" onclick="place(${x},${y})" aria-label="Поставить комнату сюда">+</button>`;
-  else cells+='<span></span>'}
- const gp=G.pos,gx=18+(gp[0]-x0)*70,gy=18+(gp[1]-y0)*70,fp=mvf?mvf.f:gp,fxp=18+(fp[0]-x0)*70,fyp=18+(fp[1]-y0)*70;
- const sprite=`<div class="gsp ${G.face==='r'?'r ':''}${mvf?'run':'idle'}" style="left:${gx}px;top:${gy}px;--fx:${fxp}px;--fy:${fyp}px;--tx:${gx}px;--ty:${gy}px"></div>`;
- const hl=c=>T.on&&TS[T.i].s===c?' hl':'';
- let dc='';
- if(G.last){const l=G.last;dc=`<div class="dice${fx?' anim':''}">`+(l.entry?`<p class="mut">Проверка входа</p><span class="die">${l.q}</span> против зла <b>${l.e}</b>: ${l.q>l.e?'засады нет':'засада'}`:`<p class="mut">Последний бросок: ${l.who}</p><span class="die">${l.x}</span> +${l.as} = <b>${l.x+l.as}</b> против <span class="die">${l.y}</span> +${l.df} = <b>${l.y+l.df}</b><br>${l.ok?'Попадание':'Промах'}`)+'</div>'}
- const fl=(t,c='')=>`<span class="fl ${c}">${t}</span>`;
- const fG=fx?(fx.gh?fl('-'+fx.gh):'')+(fx.heal?fl('+'+fx.heal,'g'):''):'',fE=fx&&fx.eh?fl('-'+fx.eh):'';
- const tu=T.on?`<div class="box tut"><p class="mut">Обучение, шаг ${T.i+1} из ${TS.length}</p><p>${TS[T.i].t}</p><button onclick="tn()">${T.i+1<TS.length?'Дальше':'Играть'}</button> <button onclick="tn(1)">Пропустить</button></div>`:'<p><button onclick="T={on:1,i:0};ui()">Обучение</button></p>';
- let bt='<p class="mut">Врага нет. Он появится при засаде или призыве.</p>';
- if(G.B){const m=G.B.mons,f=m[0];bt=`<p><b>${f.n}</b><br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}, дальность ${f.r}${f.sh?'<br>Щит: +1 к защите от физ.':''}</p>${m.length>1?`<p class="mut">Следом: ${m.slice(1).map(x=>x.n).join(', ')}.</p>`:''}<div class="acts"><button onclick="act('p')">Бить физикой (${eff('p')})</button><button onclick="act('m')">Бить магией (${eff('m')})</button><button onclick="act('a')">Бежать (${eff('a')})</button></div><p class="mut">Побег: выиграл на 3 и больше, и ты в прошлой комнате. Меньше: остался здесь, но дальнобойные монстры (дальность 2) стреляют вдогонку.</p>`}
- 
- const hand=G.disc?G.hand.map((c,i)=>`<button class="hc" onclick="drop(${i})"><b>${c.n}</b> ${c.t==='mon'?'зло '+c.c:'добро '+c.g}<small>Нажми, чтобы сбросить</small></button>`).join(''):G.hand.map((c,i)=>c.t==='mon'?`<button class="hc mon" onclick="summon(${i})" ${G.B||G.pend||G.ap<1||G.ep<c.c?'disabled':''}><b>${c.n}</b> зло ${c.c}<small>Дальность ${c.r}. Призвать и напасть первым</small></button>`:`<button class="hc" onclick="play(${i})" ${G.B||G.pend||G.ap<1?'disabled':''}><b>${c.n}</b> добро ${c.g}${c.cap?`, груз ${c.cap}`:''}<small>${c.e}</small></button>`).join('');
- const eq=G.eq.length?G.eq.map((c,j)=>`<p>${c.n} (${c.e}, груз ${c.cap}) <button onclick="unq(${j})" ${G.B?'disabled':''}>Снять</button></p>`).join(''):'<p class="mut">Предметов нет.</p>';
- const hint=G.pend?`Вытянуто: ${NM[G.pend.t].toLowerCase()}${G.pend.e?`, зло ${G.pend.e}`:''}. Нажми «+» рядом с любой комнатой.`:G.B?'Идёт бой.':'Нажми на соседнюю комнату, чтобы перейти.';
- A.innerHTML=`${tu}<div class="grid"><section class="box w-hand${hl('w-hand')}"><h2>Рука</h2>${G.disc?`<p class="warn">Конец хода. Сбрось минимум ${G.need} (сброшено: ${G.dn}). Добро уйдёт в сброс, монстры вернутся в логово. Потом рука добавится до 5 карт.</p><p><button onclick="done()" ${G.dn<G.need&&G.hand.length?'disabled':''}>Готово</button></p>`:''}${hand||'<p class="mut">Пусто</p>'}</section><section class="box w-char${hl('w-char')}${fx&&fx.gh?' flash':''}"><h2>Карта персонажа</h2><p><b>HP ${G.hp}/${G.mx}</b></p><p>${st}</p><p>Груз ${cap()}/3. Дальность ${rng()}. Добро ${G.gp}, зло ${G.ep}.</p><p><b>Действий: ${G.ap}</b></p><p class="${G.good.length<=3?'warn':''}">Карт добра: ${G.good.length}.</p><p class="${G.dun.length<=3?'warn':''}">Комнат в колоде: ${G.dun.length}${G.dun.length<=3?'. Когда они кончатся, а выход не найден, ты проиграешь.':''} <span class="mut">Ход ${G.turn}.</span></p>${fG}</section><section class="box w-items${hl('w-items')}"><h2>Предметы</h2>${eq}</section><section class="box w-enemy${hl('w-enemy')}${fx&&fx.eh?' shake':''}"><h2>Враг</h2>${dc}${bt}${fE}</section><section class="box w-field${hl('w-field')}"><h2>Поле</h2><p class="mut">${hint}</p><div class="map" style="grid-template-columns:repeat(${x1-x0+1},64px)">${cells}${sprite}</div><p><button onclick="endTurn()" ${G.B||G.pend||G.disc?'disabled':''}>Завершить ход</button></p></section><section class="box w-log${hl('w-log')}"><h2>История</h2>${lg}</section></div>`}
-ui();
-</script></body></html>
+    body {
+      margin: 0;
+      background: repeating-linear-gradient(transparent 0 27px, var(--line) 27px 28px), var(--bg);
+      color: var(--ink);
+      font: 17px/28px Spectral, Georgia, serif
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 auto 0 38px;
+      width: 2px;
+      background: var(--mg)
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 8px 14px 48px 54px
+    }
+
+    h1 {
+      font: 600 46px/52px Caveat, cursive;
+      margin: 12px 0 0
+    }
+
+    p {
+      margin: 6px 0
+    }
+
+    .box {
+      border: 1.5px solid var(--bd);
+      border-radius: 6px 14px 8px 12px;
+      background: var(--card);
+      padding: 8px 14px;
+      margin: 14px 0
+    }
+
+    button {
+      font: inherit;
+      color: var(--ink);
+      background: var(--card);
+      border: 1.5px solid var(--bd);
+      border-radius: 6px 12px 7px 10px;
+      padding: 4px 12px;
+      cursor: pointer;
+      min-height: 40px
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--blue)
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: default
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px
+    }
+
+    .card {
+      width: 158px;
+      text-align: left;
+      font-size: 15px;
+      line-height: 20px;
+      padding: 8px 10px
+    }
+
+    .card b {
+      display: block;
+      font: 600 23px/24px Caveat, cursive
+    }
+
+    .mon {
+      border-style: dashed
+    }
+
+    .warn {
+      color: var(--red)
+    }
+
+    .mut {
+      color: var(--mut);
+      font-size: 15px
+    }
+
+    .map {
+      display: grid;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px
+    }
+
+    .cell {
+      width: 64px;
+      height: 64px;
+      padding: 2px;
+      font-size: 13px;
+      line-height: 15px;
+      text-align: center;
+      min-height: 0
+    }
+
+    .cell:disabled {
+      opacity: .85
+    }
+
+    .here {
+      border: 2.5px solid var(--blue)
+    }
+
+    .free {
+      border-style: dashed;
+      font-size: 26px
+    }
+
+    .seen {
+      background: transparent
+    }
+
+    ul {
+      margin: 4px 0;
+      padding-left: 20px
+    }
+
+    .box {
+      position: relative
+    }
+
+    .lg {
+      list-style: none;
+      padding: 0
+    }
+
+    .lg li {
+      padding: 2px 8px;
+      border-left: 4px solid var(--bd);
+      margin: 0 0 6px;
+      line-height: 20px;
+      font-size: 15px
+    }
+
+    .lg li:first-child {
+      background: var(--card)
+    }
+
+    .lg .hit {
+      border-color: #2f9e63
+    }
+
+    .lg .bad {
+      border-color: #e5484d
+    }
+
+    .lg .miss {
+      color: var(--mut)
+    }
+
+    .lg .ok {
+      border-color: var(--blue)
+    }
+
+    .lg small {
+      color: var(--mut);
+      font-size: 13px;
+      line-height: 16px
+    }
+
+    .hl {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px
+    }
+
+    .tut {
+      margin: 0 0 12px
+    }
+
+    .die {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1.5px solid var(--ink);
+      border-radius: 7px;
+      font: 600 20px/1 Spectral, Georgia, serif;
+      background: var(--card)
+    }
+
+    .dice {
+      margin: 0 0 8px
+    }
+
+    @keyframes flash {
+      0% {
+        box-shadow: 0 0 0 0 transparent
+      }
+
+      30% {
+        box-shadow: 0 0 18px 4px #e5484d;
+        border-color: #e5484d
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 transparent
+      }
+    }
+
+    @keyframes shake {
+      25% {
+        transform: translateX(-5px)
+      }
+
+      75% {
+        transform: translateX(5px)
+      }
+    }
+
+    @keyframes up {
+      from {
+        opacity: 1;
+        transform: translateY(0)
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-36px)
+      }
+    }
+
+    @keyframes roll {
+      from {
+        transform: rotate(-360deg) scale(.4);
+        opacity: .2
+      }
+
+      to {
+        transform: none;
+        opacity: 1
+      }
+    }
+
+    .flash {
+      animation: flash .8s
+    }
+
+    .shake {
+      animation: shake .3s
+    }
+
+    .fl {
+      position: absolute;
+      right: 14px;
+      top: 6px;
+      font: 600 34px/1 Caveat, cursive;
+      color: #e5484d;
+      animation: up 1.1s forwards;
+      pointer-events: none
+    }
+
+    .fl.g {
+      color: #2f9e63
+    }
+
+    .anim .die {
+      animation: roll .45s
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      .flash,
+      .shake,
+      .anim .die {
+        animation: none
+      }
+
+      .fl {
+        display: none
+      }
+    }
+
+    details {
+      margin: 8px 0
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1.5fr 1fr;
+      grid-template-areas: "hand char items" "enemy field log"
+    }
+
+    .grid .box {
+      margin: 0
+    }
+
+    .w-hand {
+      grid-area: hand
+    }
+
+    .w-char {
+      grid-area: char
+    }
+
+    .w-items {
+      grid-area: items
+    }
+
+    .w-enemy {
+      grid-area: enemy
+    }
+
+    .w-field {
+      grid-area: field
+    }
+
+    .w-log {
+      grid-area: log
+    }
+
+    h2 {
+      font: 600 26px/28px Caveat, cursive;
+      margin: 0 0 4px
+    }
+
+    .hc {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 0 0 6px;
+      font-size: 15px;
+      line-height: 20px;
+      min-height: 0;
+      padding: 4px 8px
+    }
+
+    .hc small {
+      display: block;
+      color: var(--mut);
+      font-size: 13px;
+      line-height: 16px
+    }
+
+    .acts button {
+      display: block;
+      width: 100%;
+      margin: 6px 0
+    }
+
+    @media (max-width:860px) {
+      .grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: "char" "field" "enemy" "hand" "items" "log"
+      }
+    }
+
+    .al {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--bd)
+    }
+
+    .alc {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: none
+    }
+
+    .alc button {
+      min-width: 42px
+    }
+
+    .alv {
+      font: 600 30px/1 Caveat, cursive;
+      min-width: 22px;
+      text-align: center
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0b0912;
+      --ink: #e9e6ff;
+      --mut: #9a93c9;
+      --line: #0000;
+      --mg: #0000;
+      --card: #14112299;
+      --bd: #7a3cff;
+      --red: #ff4d8d;
+      --blue: #05d9e8
+    }
+
+    html {
+      background: #0b0912
+    }
+
+    body {
+      background: radial-gradient(900px 520px at 12% 8%, #ff2a6d38, transparent 62%), radial-gradient(1000px 620px at 92% 18%, #05d9e830, transparent 60%), radial-gradient(1200px 700px at 50% 120%, #7a3cff40, transparent 60%), #0b0912;
+      font: 21px/24px 'VT323', 'Courier New', monospace;
+      padding: 6px 0 40px
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      width: auto;
+      background: repeating-linear-gradient(0deg, #0000 0 2px, #00000038 2px 3px);
+      pointer-events: none;
+      z-index: 10
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      opacity: .11;
+      pointer-events: none;
+      z-index: 11;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")
+    }
+
+    main {
+      position: relative;
+      max-width: 1180px;
+      margin: 22px auto;
+      padding: 14px 18px 30px;
+      border: 10px solid #1c1834;
+      border-radius: 22px;
+      background: #0f0d1a;
+      box-shadow: 0 0 0 2px #05d9e866, 0 0 60px #7a3cff66, 0 0 150px #ff2a6d33, inset 0 0 70px #000
+    }
+
+    h1 {
+      font: 600 52px/56px Caveat, cursive;
+      color: #fff;
+      text-shadow: 0 0 8px #ff2a6d, 0 0 22px #ff2a6d, 0 0 40px #7a3cff
+    }
+
+    h2 {
+      font: 21px/24px 'VT323', monospace
+    }
+
+    .box {
+      border: 2px solid var(--bd);
+      border-radius: 3px;
+      background: #14112299;
+      box-shadow: 0 0 14px #7a3cff55
+    }
+
+    .box h2 {
+      margin: -8px -14px 8px;
+      padding: 2px 10px;
+      background: linear-gradient(90deg, #7a3cff, #ff2a6d);
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-shadow: 0 0 6px #0008
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 19px;
+      border: 2px solid var(--blue);
+      border-radius: 2px;
+      background: #0b0912;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    button:hover:not(:disabled) {
+      box-shadow: 0 0 12px var(--blue);
+      background: #05d9e81a
+    }
+
+    button:disabled {
+      border-color: #4b4575;
+      color: #6f69a0
+    }
+
+    .card b,
+    .hc b {
+      font-family: 'VT323', monospace;
+      font-size: 22px
+    }
+
+    .cell {
+      border-radius: 2px;
+      background: #1a1630;
+      font-size: 15px;
+      line-height: 14px
+    }
+
+    .cell.seen {
+      background: #221c40
+    }
+
+    .here {
+      border: 2px solid #ffd319;
+      box-shadow: 0 0 14px #ffd319
+    }
+
+    .free {
+      border-color: #ff2a6d;
+      color: #ff2a6d
+    }
+
+    .die {
+      border: 2px solid #05d9e8;
+      color: #05d9e8;
+      background: #0b0912;
+      box-shadow: 0 0 10px #05d9e866;
+      font-family: 'VT323', monospace
+    }
+
+    .lg li:first-child {
+      background: #1a1630
+    }
+
+    .hl {
+      outline: 3px solid #ffd319
+    }
+
+    .warn {
+      color: #ff4d8d
+    }
+
+    main::before {
+      content: "ЗАМЕТКА: металл на исходе, заказать у поставщика";
+      position: absolute;
+      right: 26px;
+      top: -26px;
+      width: 190px;
+      padding: 8px 10px;
+      transform: rotate(3deg);
+      background: #ffd319;
+      color: #241a00;
+      font: 600 22px/22px Caveat, cursive;
+      box-shadow: 4px 6px 0 #0006;
+      z-index: 5;
+      pointer-events: none
+    }
+
+    main::after {
+      content: "голем v3: проверить ловкость, скетчи монстров";
+      position: absolute;
+      left: 22px;
+      bottom: -30px;
+      width: 210px;
+      padding: 8px 10px 8px 26px;
+      transform: rotate(-3deg);
+      color: #222;
+      font: 600 21px/22px Caveat, cursive;
+      background: repeating-linear-gradient(#f3f4f8 0 21px, #9db6e0 21px 22px);
+      box-shadow: 4px 6px 0 #0006;
+      clip-path: polygon(0 0, 100% 4%, 98% 100%, 3% 96%);
+      z-index: 5;
+      pointer-events: none
+    }
+
+    @media (max-width:760px) {
+
+      main::before,
+      main::after {
+        display: none
+      }
+
+      main {
+        margin: 8px;
+        padding: 10px
+      }
+    }
+
+    .warn-sign {
+      display: inline-block;
+      position: relative;
+      margin: 14px 0 22px;
+      padding: 6px 20px 6px 62px;
+      font: 400 38px/40px 'VT323', 'Courier New', monospace;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #ffd319;
+      background: #0b0912;
+      border: 2px solid #ffd319;
+      text-shadow: 0 0 8px #ffd319aa;
+      box-shadow: 0 0 16px #ffd31966, inset 0 0 12px #ffd31933
+    }
+
+    .warn-sign::before {
+      content: "!";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 32px;
+      display: grid;
+      place-items: end center;
+      background: #ffd319;
+      color: #0b0912;
+      font: 700 26px/1 'VT323', monospace;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      text-shadow: none
+    }
+
+    .warn-sign::after {
+      content: "";
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      bottom: -14px;
+      height: 9px;
+      background: repeating-linear-gradient(-45deg, #ffd319 0 10px, #0b0912 10px 20px)
+    }
+
+    .warn-sign.lose {
+      color: #ff4d8d;
+      border-color: #ff4d8d;
+      text-shadow: 0 0 8px #ff2a6d, 0 0 22px #ff2a6d;
+      box-shadow: 0 0 20px #ff2a6d88, inset 0 0 14px #ff2a6d44;
+      animation: flick 3s infinite
+    }
+
+    .warn-sign.lose::before {
+      background: #ff4d8d
+    }
+
+    .warn-sign.lose::after {
+      background: repeating-linear-gradient(-45deg, #ff4d8d 0 10px, #0b0912 10px 20px)
+    }
+
+    .warn-sign.win {
+      color: #05d9e8;
+      border-color: #05d9e8;
+      text-shadow: 0 0 8px #05d9e8;
+      box-shadow: 0 0 18px #05d9e888, inset 0 0 12px #05d9e833
+    }
+
+    .warn-sign.win::before {
+      background: #05d9e8
+    }
+
+    .warn-sign.win::after {
+      background: repeating-linear-gradient(-45deg, #05d9e8 0 10px, #0b0912 10px 20px)
+    }
+
+    @keyframes flick {
+
+      0%,
+      90%,
+      100% {
+        opacity: 1
+      }
+
+      92% {
+        opacity: .35
+      }
+
+      94% {
+        opacity: 1
+      }
+
+      97% {
+        opacity: .55
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .warn-sign.lose {
+        animation: none
+      }
+    }
+
+    @media (max-width:760px) {
+      .warn-sign {
+        font-size: 26px;
+        line-height: 28px;
+        letter-spacing: .06em;
+        padding: 4px 12px 4px 50px
+      }
+
+      .warn-sign::before {
+        width: 30px;
+        height: 27px;
+        font-size: 21px
+      }
+    }
+
+    .map {
+      position: relative
+    }
+
+    .cell.here {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: center
+    }
+
+    .gsp {
+      position: absolute;
+      width: 36px;
+      height: 48px;
+      background: url(golem-run.png) 0 -8px/512px 64px no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 3;
+      filter: drop-shadow(0 0 6px #05d9e8aa)
+    }
+
+    .gsp.r {
+      transform: scaleX(-1)
+    }
+
+    .gsp.idle {
+      background-position-x: -168px;
+      animation: gidle 1s steps(2) infinite
+    }
+
+    .gsp.run {
+      animation: gwalk .5s linear forwards, grun .25s steps(4) 1, gidle 1s steps(2) .5s infinite
+    }
+
+    @keyframes gwalk {
+      from {
+        left: var(--fx);
+        top: var(--fy)
+      }
+
+      to {
+        left: var(--tx);
+        top: var(--ty)
+      }
+    }
+
+    @keyframes grun {
+      from {
+        background-position-x: 0
+      }
+
+      to {
+        background-position-x: -168px
+      }
+    }
+
+    @keyframes gidle {
+      from {
+        background-position-x: -168px
+      }
+
+      to {
+        background-position-x: -252px
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .gsp {
+        animation: none !important
+      }
+
+      .gsp.run {
+        background-position-x: -168px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1 id="ttl" class="warn-sign">Голем в подземелье</h1>
+    <p class="mut">Прототип, этаж 1. Скетчи пока заменены подписями.</p>
+    <details>
+      <summary>Правила в двух словах</summary>
+      <ul>
+        <li>Перед стартом распределяешь 5 очков между физом, магом и ловкостью (максимум 3 в одном).</li>
+        <li>Каждый ход ты тянешь комнату вслепую и ставишь её в свободную клетку рядом с любой выложенной комнатой.</li>
+        <li>Потом у тебя 2 действия: разыграть карту (добро за очки добра) или перейти в соседнюю комнату. Призвать
+          монстра из руки за очки зла тоже стоит действие.</li>
+        <li>Новая комната: бросок d6. Больше очков зла комнаты — засады нет, иначе нападают монстры на сумму не больше
+          этого зла. Вход даёт очки зла, равные злу комнаты.</li>
+        <li>Бой: d6 плюс стат против d6 плюс тот же стат защитника. Побеждает атакующий, если сумма больше, урон равен
+          стату.</li>
+        <li>Побег бросается на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в
+          комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку (и ты тоже, если есть предмет на
+          дальность). Оставшиеся монстры настигают тебя в начале следующего хода.</li>
+        <li>За убитого монстра получаешь очки добра, равные его цене. Предметы занимают груз (всего 3).</li>
+        <li>Когда заканчиваешь ход, нужно сбросить минимум одну карту по своему выбору (если в руке больше 5, то
+          столько, чтобы осталось 5). Добро уходит в сброс, монстры возвращаются в логово. Потом рука добирается до 5
+          карт.</li>
+        <li>Выход лежит в нижней части колоды. Вход в него заканчивает этаж. Комнаты в колоде конечны: если они
+          кончились, а выход не найден, этаж проигран.</li>
+      </ul>
+    </details>
+    <div id="app"></div>
+    <p class="mut">Нашёл странность или есть идея? Расскажи тому, кто прислал ссылку: именно для этого прототип и нужен.
+    </p>
+  </main>
+  <script>
+    const r = n => Math.floor(Math.random() * n), d6 = () => 1 + r(6), sh = a => { for (let i = a.length - 1; i > 0; i--) { const j = r(i + 1);[a[i], a[j]] = [a[j], a[i]] } return a };
+    const MON = { gob: { n: 'Гоблин', r: 1, c: 1, hp: 3, p: 1, m: 1, a: 2 }, arb: { n: 'Гоблин с арбалетом', r: 2, c: 2, hp: 3, p: 2, m: 1, a: 1 }, ske: { n: 'Скелет', r: 1, c: 2, hp: 4, p: 2, m: 1, a: 1 }, spe: { n: 'Скелет-копейщик', r: 2, c: 3, hp: 4, p: 3, m: 1, a: 0 }, zom: { n: 'Зомби', r: 1, c: 2, hp: 6, p: 2, m: 1, a: 0 }, shd: { n: 'Зомби со щитом', r: 1, c: 3, hp: 7, p: 2, m: 1, a: 1, sh: 1 } };
+    const IT = { pl: { n: 'Стальные пластины', cap: 2, g: 1, p: 1, e: '+1 физ' }, le: { n: 'Кристалл-линза', cap: 2, g: 1, m: 1, e: '+1 маг' }, sp: { n: 'Пружинные сочленения', cap: 1, g: 1, a: 1, e: '+1 ловк' }, rg: { n: 'Манипулятор-удлинитель', cap: 1, g: 1, r: 1, e: '+1 дальность' }, tk: { n: 'Запасной бак', cap: 1, g: 1, hp: 2, e: '+2 HP' }, ar: { n: 'Бронеплита', cap: 3, g: 2, hp: 3, e: '+3 HP' } };
+    const SP = { rep: { n: 'Ремонт', g: 1, e: '+3 HP сейчас' }, ov: { n: 'Перегрузка', g: 1, p: 2, e: '+2 физ до конца боя' }, fo: { n: 'Фокус', g: 1, m: 2, e: '+2 маг до конца боя' }, lu: { n: 'Смазка', g: 1, a: 2, e: '+2 ловк до конца боя' } };
+    const BUILDS = [{ n: 'Силач', s: [3, 1, 1] }, { n: 'Маг', s: [1, 3, 1] }, { n: 'Универсал', s: [2, 2, 1] }];
+    const NM = { start: 'Вход', norm: 'Комната', rest: 'Комната отдыха', loot: 'Комната с добычей', exit: 'Выход с этажа' };
+    const D = [[1, 0], [-1, 0], [0, 1], [0, -1]], key = (x, y) => x + ',' + y;
+    let G = null, AL = [2, 2, 1];
+    function al(i, d) { const n = AL[i] + d; if (n < 0 || n > 3 || AL.reduce((x, y) => x + y, 0) + d > 5) return; AL[i] = n; ui() }
+    function pre(i) { AL = [...BUILDS[i].s]; ui() }
+    const L = (a, c = 'sys', b = '') => G.log.unshift({ a, c, b });
+    const FX = (k, v) => { G.fx = G.fx || {}; G.fx[k] = v };
+    const NS = { p: 'Физ', m: 'Маг', a: 'Ловк' };
+    function LR(who, k, x, as, y, df, ok, dmg) {
+      const n = G.B.n = (G.B.n || 0) + 1, g = who === 'Голем'; G.last = { who, x, as, y, df, ok };
+      L(ok ? (g ? `Попадание: ${dmg} урона` : `${who} попал: ${dmg} урона`) : (g ? 'Промах: 0 урона' : `${who} промахнулся: 0 урона`), ok ? (g ? 'hit' : 'bad') : 'miss', `${n}. ${who}: Атака (${NS[k]}) ${x}+${as}=${x + as}, защита ${y}+${df}=${y + df}.` + (ok ? ` Урон равен стату атаки (${as}).` : ''))
+    }
+    function LE(x, as, y, df, ok) { L(ok ? 'Побег: удался' : 'Побег: не вышел', ok ? 'ok' : 'miss', `Ловк ${x}+${as}=${x + as} против ${y}+${df}=${y + df}.`) }
+    function LC(q, e, extra) { const ok = q > e; G.last = { entry: 1, q, e }; L(`Вход: проверка ${q} (нужно больше ${e}). ` + (ok ? 'Успех!' : 'Провал!'), ok ? 'ok' : 'bad', ok ? 'Засады нет.' : 'Засада: ' + (extra || '')) }
+    const TS = [{ s: 'w-field', t: 'Каждый ход начинается с комнаты, вытянутой вслепую. Нажми «+» рядом с любой комнатой, чтобы поставить её туда.' },
+    { s: 'w-char', t: 'У тебя 2 действия за ход. Действие это переход в соседнюю комнату или розыгрыш карты. Физ и маг дают урон, ловкость нужна для побега.' },
+    { s: 'w-field', t: 'Нажми на соседнюю комнату, чтобы перейти в неё. В новой комнате бросается d6: если выпало больше числа зла комнаты, засады нет.' },
+    { s: 'w-log', t: 'Здесь записан каждый бросок: кубик плюс стат нападающего против кубика плюс тот же стат защищающегося. Если сумма нападающего больше, он попал, а урон равен стату его атаки.' },
+    { s: 'w-enemy', t: 'Побег решается тем же броском на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку. Предмет на дальность даст выстрел в ответ.' },
+    { s: 'w-hand', t: 'Карты добра стоят очки добра, а их дают за убитых монстров. Монстров из руки можно призвать за очки зла, которые даёт вход в новую комнату. В конце каждого хода нужно сбросить минимум одну карту, а потом рука добирается до 5.' },
+    { s: 'w-items', t: 'Предметы занимают груз (всего 3) и дают постоянные бонусы. Снятый предмет уходит в сброс. Цель этажа: найти выход, он лежит в нижней части колоды. Комнаты в колоде конечны: если они закончатся до выхода, ты проиграешь.' }];
+    let T = { on: 1, i: 0 }; try { if (localStorage.getItem('gt')) T.on = 0 } catch (e) { }
+    function tn(sk) { if (sk || T.i + 1 >= TS.length) { T.on = 0; try { localStorage.setItem('gt', '1') } catch (e) { } } else T.i++; ui() }
+    const eff = k => G.s[k] + G.tmp[k] + G.eq.reduce((x, i) => x + (i[k] || 0), 0);
+    const rng = () => 1 + G.eq.reduce((x, i) => x + (i.r || 0), 0);
+    const cap = () => G.eq.reduce((x, i) => x + i.cap, 0);
+    const rs = () => { if (!G.evil.length && G.eDis.length) { G.evil = sh(G.eDis); G.eDis = [] } };
+    const lab = rm => rm.t === 'start' ? 'Вход' : rm.t === 'norm' ? 'Зло ' + rm.e : rm.t === 'rest' ? 'Отдых' : rm.t === 'loot' ? 'Лут, зло ' + rm.e : 'Выход';
+    function go(b) {
+      const it = ['pl', 'pl', 'le', 'sp', 'rg', 'tk', 'ar'].map(k => ({ t: 'item', k, ...IT[k] }));
+      const spl = ['rep', 'rep', 'rep', 'ov', 'ov', 'fo', 'fo', 'lu'].map(k => ({ t: 'spell', k, ...SP[k] }));
+      const d = sh([...[1, 1, 1, 2, 2, 2, 3, 3].map(e => ({ t: 'norm', e })), { t: 'rest' }, { t: 'rest' }, { t: 'loot', e: 4 }, { t: 'loot', e: 4 }]);
+      d.forEach(x => x.mons = []); d.splice(r(5), 0, { t: 'exit', mons: [] });
+      const ev = []; for (const k in MON) for (let i = 0; i < 2; i++)ev.push({ t: 'mon', k, ...MON[k], mx: MON[k].hp });
+      G = { hp: 8, mx: 8, s: { p: b[0], m: b[1], a: b[2] }, eq: [], tmp: { p: 0, m: 0, a: 0 }, gp: 2, ep: 0, ap: 2, good: sh([...it, ...spl]), evil: sh(ev), eDis: [], gDis: [], dun: d, map: { '0,0': { t: 'start', e: 0, vis: 1, mons: [] } }, pos: [0, 0], prev: [0, 0], pend: null, hand: [], B: null, log: [], over: null, turn: 1 };
+      drawUp(); newTurn(); ui()
+    }
+    function newTurn() { G.ap = 2; if (!G.dun.length) { G.over = 'lose'; return } G.pend = G.dun.pop(); L(`Ход ${G.turn}. Вытянута комната: ${NM[G.pend.t].toLowerCase()}${G.pend.e ? `, зло ${G.pend.e}` : ''}. Выбери клетку.`); if (G.dun.length <= 3) L(`Осталось комнат: ${G.dun.length}. Когда они кончатся, а выход не найден, ты проиграешь.`, 'bad') }
+    function drawUp() { while (G.hand.length < 5) { rs(); const pg = G.good.length, pe = G.evil.length; if (!pg && !pe) break; G.hand.push((pg && (!pe || r(2))) ? G.good.pop() : G.evil.pop()) } }
+    function place(x, y) { if (!G.pend) return; G.map[key(x, y)] = G.pend; G.pend = null; L('Комната выложена. У тебя 2 действия.'); ui() }
+    function pick(E) {
+      rs(); const out = []; let rem = E;
+      for (let i = 0; i < 4; i++) {
+        const pool = [...G.hand.filter(c => c.t === 'mon'), ...G.evil.slice(-3)].filter(c => c.c <= rem); if (!pool.length) break;
+        const mx = Math.max(...pool.map(c => c.c)), o = pool.filter(c => c.c === mx), c = o[r(o.length)], a = G.hand.indexOf(c);
+        if (a >= 0) G.hand.splice(a, 1); else G.evil.splice(G.evil.indexOf(c), 1); out.push(c); rem -= c.c
+      }
+      return out
+    }
+    function clear(rm) { if (rm.t === 'loot' && !rm.lt) { rm.lt = 1; const got = []; for (let i = 0; i < 2 && G.good.length; i++) { const c = G.good.pop(); G.hand.push(c); got.push(c.n) } L('Добыча: ' + (got.join(', ') || 'ничего, колода добра пуста') + '.') } }
+    function move(x, y) {
+      if (G.B || G.pend || G.ap < 1 || G.over) return; const rm = G.map[key(x, y)]; if (!rm) return;
+      if (typeof window !== 'undefined') { if (Date.now() - (G.mv || 0) < 450) return; G.mv = Date.now() }
+      G.ap--; { const dx = x - G.pos[0]; if (dx) G.face = dx > 0 ? 'r' : 'l' } G.mvfx = { f: [...G.pos] }; G.prev = G.pos; G.pos = [x, y]; const first = !rm.vis; rm.vis = 1;
+      if (rm.t === 'exit') { G.over = 'win'; return ui() }
+      if (rm.t === 'rest') { if (first) { G.hp = Math.min(G.mx, G.hp + 3); L('Комната отдыха: +3 HP.', 'ok'); FX('heal', 3) } else L('Комната отдыха уже использована.'); return ui() }
+      if (first) { G.ep += rm.e; L(`Новая комната (зло ${rm.e}): +${rm.e} очк. зла.`) }
+      if (rm.mons.length) { L('Оставшиеся монстры нападают.'); G.B = { rm, mons: rm.mons, amb: 1 }; mTurn(); return ui() }
+      if (first) {
+        const q = d6();
+        if (q > rm.e) { LC(q, rm.e); clear(rm) }
+        else {
+          rm.mons = pick(rm.e); if (!rm.mons.length) { LC(q, rm.e, 'монстров не нашлось'); clear(rm) }
+          else { LC(q, rm.e, rm.mons.map(m => m.n).join(', ')); G.B = { rm, mons: rm.mons, amb: 1 }; mTurn() }
+        }
+      }
+      ui()
+    }
+    function summon(i) {
+      if (G.B || G.pend || G.ap < 1 || G.over) return; const c = G.hand[i], rm = G.map[key(...G.pos)];
+      if (rm.t === 'rest') { L('В комнате отдыха призывать нельзя.'); return ui() }
+      if (G.ep < c.c) { L(`Не хватает очков зла: нужно ${c.c}.`); return ui() }
+      G.ep -= c.c; G.ap--; G.hand.splice(i, 1); G.B = { rm, mons: [c], amb: 0 }; L(`Ты призвал: ${c.n}. Нападаешь первым.`); ui()
+    }
+    function mTurn() {
+      const m = G.B.mons[0], x = d6(), y = d6(), dm = eff('p'), ok = x + m.p > y + dm;
+      LR(m.n, 'p', x, m.p, y, dm, ok, m.p);
+      if (ok) { FX('gh', m.p); G.hp -= m.p; if (G.hp <= 0) { G.hp = 0; G.over = 'lose' } }
+    }
+    function act(k) {
+      const B = G.B; if (!B || G.over) return; const m = B.mons[0], x = d6(), y = d6();
+      if (k === 'a') {
+        const mg = x + eff('a') - y - m.a, ok = mg > 0; LE(x, eff('a'), y, m.a, ok);
+        if (ok) {
+          G.tmp = { p: 0, m: 0, a: 0 }; G.B = null;
+          if (!B.amb) { G.evil.unshift(...B.mons.map(c => (c.hp = c.mx, c))); L('Призванный монстр вернулся в логово.') }
+          else if (mg >= 3) { { const dx = G.prev[0] - G.pos[0]; if (dx) G.face = dx > 0 ? 'r' : 'l' } G.mvfx = { f: [...G.pos] }; G.pos = G.prev; L('Побег с большим отрывом: голем ушёл в прошлую комнату. Монстры остались в комнате с прежним HP.', 'ok') }
+          else { L('Побег с малым отрывом (меньше 3): голем вырвался из ближнего боя, но остался в комнате.', 'ok'); shots(B) }
+          return ui()
+        }
+      }
+      else {
+        const df = m[k] + (k === 'p' && m.sh ? 1 : 0), dm = eff(k), ok = x + dm > y + df;
+        LR('Голем', k, x, dm, y, df, ok, dm);
+        if (ok) {
+          FX('eh', dm); m.hp -= dm; if (m.hp <= 0) {
+            G.gp += m.c; L(`${m.n} разрушен: +${m.c} очк. добра.`); B.mons.shift(); m.hp = m.mx; G.eDis.push(m);
+            if (!B.mons.length) { G.tmp = { p: 0, m: 0, a: 0 }; G.B = null; L('Бой выигран.'); if (B.amb) clear(B.rm); return ui() }
+          }
+        }
+      }
+      mTurn(); ui()
+    }
+    function shots(B) {
+      for (const m of B.mons) {
+        if (m.r < 2 || G.over) continue; const x = d6(), y = d6(), dm = eff('p'), ok = x + m.p > y + dm;
+        L(`${m.n} стреляет вдогонку: ` + (ok ? `попал, урон ${m.p}.` : 'мимо.'), ok ? 'bad' : 'miss', `Физ ${x}+${m.p}=${x + m.p} против ${y}+${dm}=${y + dm}.`);
+        if (ok) { FX('gh', m.p); G.hp -= m.p; if (G.hp <= 0) { G.hp = 0; G.over = 'lose' } }
+      }
+      if (rng() >= 2 && !G.over && B.mons.length) {
+        const f = B.mons[0], k = (eff('m') - f.m > eff('p') - f.p) ? 'm' : 'p', dm = eff(k), df = f[k] + (k === 'p' && f.sh ? 1 : 0), x = d6(), y = d6(), ok = x + dm > y + df;
+        L('Твой выстрел вдогонку: ' + (ok ? `попал, урон ${dm}.` : 'мимо.'), ok ? 'hit' : 'miss', `${NS[k]} ${x}+${dm}=${x + dm} против ${y}+${df}=${y + df}.`);
+        if (ok) { FX('eh', dm); f.hp -= dm; if (f.hp <= 0) { G.gp += f.c; L(`${f.n} разрушен: +${f.c} очк. добра.`); B.mons.shift(); f.hp = f.mx; G.eDis.push(f) } }
+      }
+    }
+    function play(i) {
+      if (G.B || G.over || G.pend || G.ap < 1) { L('Сейчас карту разыграть нельзя: нужно действие, и не в бою.'); return ui() }
+      const c = G.hand[i]; if (G.gp < c.g) { L(`Не хватает очков добра: нужно ${c.g}.`); return ui() }
+      if (c.t === 'item') { if (cap() + c.cap > 3) { L('Не хватает груза. Сними предмет.'); return ui() } G.eq.push(c); if (c.hp) { G.mx += c.hp; G.hp += c.hp } L('Установлено: ' + c.n + '.') }
+      else { if (c.k === 'rep') { G.hp = Math.min(G.mx, G.hp + 3); FX('heal', 3) } else for (const k of 'pma') G.tmp[k] += c[k] || 0; G.gDis.push(c); L('Заклинание: ' + c.n + '.') }
+      G.gp -= c.g; G.ap--; G.hand.splice(i, 1); ui()
+    }
+    function unq(j) { if (G.B || G.over) return; const c = G.eq.splice(j, 1)[0]; if (c.hp) { G.mx -= c.hp; G.hp = Math.min(G.hp, G.mx) } G.gDis.push(c); L(c.n + ' снят и отправлен в сброс.'); ui() }
+    function endTurn() {
+      if (G.B || G.pend || G.over || G.disc) return;
+      if (!G.hand.length) return fin();
+      G.disc = 1; G.dn = 0; G.need = Math.max(1, G.hand.length - 5);
+      L(`Конец хода: сбрось минимум ${G.need} ${G.need == 1 ? 'карту' : G.need < 5 ? 'карты' : 'карт'}.`, 'bad'); ui()
+    }
+    function drop(i) { const c = G.hand.splice(i, 1)[0]; G.dn++; if (c.t === 'mon') { G.evil.unshift(c); L(c.n + ' вернулся в логово.') } else { G.gDis.push(c); L(c.n + ' ушла в сброс.') } ui() }
+    function done() { if (!G.disc || (G.dn < G.need && G.hand.length)) return; G.disc = 0; fin() }
+    function fin() {
+      const old = [...G.hand]; drawUp(); const nw = G.hand.filter(c => !old.includes(c));
+      L(nw.length ? `Добор до 5 карт: ${nw.map(c => c.n).join(', ')}.` : 'Рука уже полная, добирать нечего.', 'ok');
+      G.turn++; newTurn(); const cr = G.map[key(...G.pos)]; if (!G.over && cr.mons.length && !G.B) { L('Монстры в комнате настигли голема.', 'bad'); G.B = { rm: cr, mons: cr.mons, amb: 1 }; mTurn() } ui()
+    }
+    function ui() {
+      const A = document.getElementById('app');
+      const ti = document.getElementById('ttl');
+      ti.className = 'warn-sign ' + (!G ? 'st' : G.over === 'lose' ? 'lose' : G.over === 'win' ? 'win' : 'play');
+      ti.textContent = !G ? 'Выбор Голема' : G.over === 'lose' ? (G.hp <= 0 ? 'Голем разрушен' : 'Выход не найден') : G.over === 'win' ? 'Этаж пройден' : 'Голем в подземелье'; const fx = G ? G.fx : null; if (G) G.fx = null; const mvf = G ? G.mvfx : null; if (G) G.mvfx = null;
+      if (!G) {
+        const left = 5 - AL.reduce((x, y) => x + y, 0),
+          rows = [['Физ', 'Бьёшь физикой и защищаешься от ударов монстров (пока все они бьют физикой).', 'Монстры бьют по тебе физикой, защита будет слабой.'],
+          ['Маг', 'Бьёшь магией. Защиты не даёт: монстры пока бьют только физикой.', 'Магические удары почти всегда будут мимо.'],
+          ['Ловк', 'Нужна для побега. Ударов ловкостью нет.', 'Побег почти невозможен.']];
+        A.innerHTML = `<div class="box"><h2>Распредели 5 очков голема</h2><p class="mut">Максимум 3 в одном стате. HP 8, груз 3, 2 действия за ход.</p>${rows.map((r, i) => `<div class="al"><div><b>${r[0]}</b><br><small class="mut">${r[1]}</small>${AL[i] == 0 ? `<br><small class="warn">Ноль: ${r[2]}</small>` : ''}</div><div class="alc"><button onclick="al(${i},-1)" ${AL[i] <= 0 ? 'disabled' : ''} aria-label="Меньше">−</button><span class="alv">${AL[i]}</span><button onclick="al(${i},1)" ${AL[i] >= 3 || left <= 0 ? 'disabled' : ''} aria-label="Больше">+</button></div></div>`).join('')}<p><b>Осталось очков: ${left}</b></p><p><button onclick="go(AL)" ${left ? 'disabled' : ''}>Начать игру</button></p><p class="mut">Быстрый выбор:</p><div class="cards">${BUILDS.map((b, i) => `<button class="card" onclick="pre(${i})"><b>${b.n}</b>физ ${b.s[0]}, маг ${b.s[1]}, ловк ${b.s[2]}</button>`).join('')}</div></div>`; return
+      }
+      const lg = '<ul class="lg">' + G.log.slice(0, 12).map(e => `<li class="${e.c}"><b>${e.a}</b>${e.b ? `<br><small>${e.b}</small>` : ''}</li>`).join('') + '</ul>';
+      if (G.over) { A.innerHTML = `<div class="box"><p><b>${G.over === 'win' ? 'Этаж пройден. Голем нашёл выход.' : G.hp <= 0 ? 'Голем разрушен.' : 'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over === 'lose' && G.hp > 0 ? '<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>' : ''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`; return }
+      const st = [['p', 'физ'], ['m', 'маг'], ['a', 'ловк']].map(([k, n]) => `${n} ${eff(k)}${G.tmp[k] ? ` (+${G.tmp[k]})` : ''}`).join(', ');
+      const ks = Object.keys(G.map).map(k => k.split(',').map(Number)), cand = [];
+      if (G.pend) for (const [x, y] of ks) for (const [dx, dy] of D) { const c = [x + dx, y + dy]; if (!G.map[key(...c)] && !cand.some(q => q[0] == c[0] && q[1] == c[1])) cand.push(c) }
+      const all = [...ks, ...cand], xs = all.map(p => p[0]), ys = all.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      let cells = '';
+      for (let y = y0; y <= y1; y++)for (let x = x0; x <= x1; x++) {
+        const rm = G.map[key(x, y)];
+        if (rm) {
+          const here = x == G.pos[0] && y == G.pos[1], can = Math.abs(x - G.pos[0]) + Math.abs(y - G.pos[1]) == 1 && !G.B && !G.pend && !G.disc && G.ap > 0;
+          cells += `<button class="cell${here ? ' here' : ''}${rm.vis ? ' seen' : ''}" ${can ? `onclick="move(${x},${y})"` : 'disabled'}>${lab(rm)}${rm.mons.length ? '<br>монстр' : ''}</button>`
+        }
+        else if (cand.some(c => c[0] == x && c[1] == y)) cells += `<button class="cell free" onclick="place(${x},${y})" aria-label="Поставить комнату сюда">+</button>`;
+        else cells += '<span></span>'
+      }
+      const gp = G.pos, gx = 18 + (gp[0] - x0) * 70, gy = 18 + (gp[1] - y0) * 70, fp = mvf ? mvf.f : gp, fxp = 18 + (fp[0] - x0) * 70, fyp = 18 + (fp[1] - y0) * 70;
+      const sprite = `<div class="gsp ${G.face === 'r' ? 'r ' : ''}${mvf ? 'run' : 'idle'}" style="left:${gx}px;top:${gy}px;--fx:${fxp}px;--fy:${fyp}px;--tx:${gx}px;--ty:${gy}px"></div>`;
+      const hl = c => T.on && TS[T.i].s === c ? ' hl' : '';
+      let dc = '';
+      if (G.last) { const l = G.last; dc = `<div class="dice${fx ? ' anim' : ''}">` + (l.entry ? `<p class="mut">Проверка входа</p><span class="die">${l.q}</span> против зла <b>${l.e}</b>: ${l.q > l.e ? 'засады нет' : 'засада'}` : `<p class="mut">Последний бросок: ${l.who}</p><span class="die">${l.x}</span> +${l.as} = <b>${l.x + l.as}</b> против <span class="die">${l.y}</span> +${l.df} = <b>${l.y + l.df}</b><br>${l.ok ? 'Попадание' : 'Промах'}`) + '</div>' }
+      const fl = (t, c = '') => `<span class="fl ${c}">${t}</span>`;
+      const fG = fx ? (fx.gh ? fl('-' + fx.gh) : '') + (fx.heal ? fl('+' + fx.heal, 'g') : '') : '', fE = fx && fx.eh ? fl('-' + fx.eh) : '';
+      const tu = T.on ? `<div class="box tut"><p class="mut">Обучение, шаг ${T.i + 1} из ${TS.length}</p><p>${TS[T.i].t}</p><button onclick="tn()">${T.i + 1 < TS.length ? 'Дальше' : 'Играть'}</button> <button onclick="tn(1)">Пропустить</button></div>` : '<p><button onclick="T={on:1,i:0};ui()">Обучение</button></p>';
+      let bt = '<p class="mut">Врага нет. Он появится при засаде или призыве.</p>';
+      if (G.B) { const m = G.B.mons, f = m[0]; bt = `<p><b>${f.n}</b><br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}, дальность ${f.r}${f.sh ? '<br>Щит: +1 к защите от физ.' : ''}</p>${m.length > 1 ? `<p class="mut">Следом: ${m.slice(1).map(x => x.n).join(', ')}.</p>` : ''}<div class="acts"><button onclick="act('p')">Бить физикой (${eff('p')})</button><button onclick="act('m')">Бить магией (${eff('m')})</button><button onclick="act('a')">Бежать (${eff('a')})</button></div><p class="mut">Побег: выиграл на 3 и больше, и ты в прошлой комнате. Меньше: остался здесь, но дальнобойные монстры (дальность 2) стреляют вдогонку.</p>` }
+
+      const hand = G.disc ? G.hand.map((c, i) => `<button class="hc" onclick="drop(${i})"><b>${c.n}</b> ${c.t === 'mon' ? 'зло ' + c.c : 'добро ' + c.g}<small>Нажми, чтобы сбросить</small></button>`).join('') : G.hand.map((c, i) => c.t === 'mon' ? `<button class="hc mon" onclick="summon(${i})" ${G.B || G.pend || G.ap < 1 || G.ep < c.c ? 'disabled' : ''}><b>${c.n}</b> зло ${c.c}<small>Дальность ${c.r}. Призвать и напасть первым</small></button>` : `<button class="hc" onclick="play(${i})" ${G.B || G.pend || G.ap < 1 ? 'disabled' : ''}><b>${c.n}</b> добро ${c.g}${c.cap ? `, груз ${c.cap}` : ''}<small>${c.e}</small></button>`).join('');
+      const eq = G.eq.length ? G.eq.map((c, j) => `<p>${c.n} (${c.e}, груз ${c.cap}) <button onclick="unq(${j})" ${G.B ? 'disabled' : ''}>Снять</button></p>`).join('') : '<p class="mut">Предметов нет.</p>';
+      const hint = G.pend ? `Вытянуто: ${NM[G.pend.t].toLowerCase()}${G.pend.e ? `, зло ${G.pend.e}` : ''}. Нажми «+» рядом с любой комнатой.` : G.B ? 'Идёт бой.' : 'Нажми на соседнюю комнату, чтобы перейти.';
+      A.innerHTML = `${tu}<div class="grid"><section class="box w-hand${hl('w-hand')}"><h2>Рука</h2>${G.disc ? `<p class="warn">Конец хода. Сбрось минимум ${G.need} (сброшено: ${G.dn}). Добро уйдёт в сброс, монстры вернутся в логово. Потом рука добавится до 5 карт.</p><p><button onclick="done()" ${G.dn < G.need && G.hand.length ? 'disabled' : ''}>Готово</button></p>` : ''}${hand || '<p class="mut">Пусто</p>'}</section><section class="box w-char${hl('w-char')}${fx && fx.gh ? ' flash' : ''}"><h2>Карта персонажа</h2><p><b>HP ${G.hp}/${G.mx}</b></p><p>${st}</p><p>Груз ${cap()}/3. Дальность ${rng()}. Добро ${G.gp}, зло ${G.ep}.</p><p><b>Действий: ${G.ap}</b></p><p class="${G.good.length <= 3 ? 'warn' : ''}">Карт добра: ${G.good.length}.</p><p class="${G.dun.length <= 3 ? 'warn' : ''}">Комнат в колоде: ${G.dun.length}${G.dun.length <= 3 ? '. Когда они кончатся, а выход не найден, ты проиграешь.' : ''} <span class="mut">Ход ${G.turn}.</span></p>${fG}</section><section class="box w-items${hl('w-items')}"><h2>Предметы</h2>${eq}</section><section class="box w-enemy${hl('w-enemy')}${fx && fx.eh ? ' shake' : ''}"><h2>Враг</h2>${dc}${bt}${fE}</section><section class="box w-field${hl('w-field')}"><h2>Поле</h2><p class="mut">${hint}</p><div class="map" style="grid-template-columns:repeat(${x1 - x0 + 1},64px)">${cells}${sprite}</div><p><button onclick="endTurn()" ${G.B || G.pend || G.disc ? 'disabled' : ''}>Завершить ход</button></p></section><section class="box w-log${hl('w-log')}"><h2>История</h2>${lg}</section></div>`
+    }
+    ui();
+  </script>
+</body>
+
+</html>
