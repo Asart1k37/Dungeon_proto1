@@ -822,7 +822,7 @@
 
     .gsp {
       position: absolute;
-      width: 36px;
+      width: 42px;
       height: 48px;
       background: url(golem-run.png) 0 -8px/512px 64px no-repeat;
       image-rendering: pixelated;
@@ -844,6 +844,11 @@
       animation: gwalk .5s linear forwards, grun .5s steps(4) 1, gidle 1s steps(2) .5s infinite
     }
 
+    .gsp.dead {
+      background-position-x: -252px;
+      animation: gdie .9s steps(3) 1 forwards
+    }
+
     @keyframes gwalk {
       from {
         left: var(--fx);
@@ -863,6 +868,16 @@
 
       to {
         background-position-x: -168px
+      }
+    }
+
+    @keyframes gdie {
+      from {
+        background-position-x: -252px
+      }
+
+      to {
+        background-position-x: -378px
       }
     }
 
@@ -925,6 +940,7 @@
     <div id="app"></div>
     <section id="dbg" hidden><b>ОТЛАДКА</b> <button onclick="dbgToggle()">Скрыть [ё]</button>
       <div class="dbgrow"><button onclick="dbgPoints()">+ очки</button> <button onclick="dbgHeal()">Лечение</button>
+        <button onclick="dbgKill()">Убить</button>
       </div>
       <div class="dbgrow"><select id="dm"></select> <button onclick="dbgMon()">Вызвать врага в бой</button></div>
       <div class="dbgrow"><select id="dc"></select> <button onclick="dbgCard()">Карту в руку</button></div>
@@ -950,6 +966,7 @@
     const L = (a, c = 'sys', b = '') => G.log.unshift({ a, c, b });
     const FX = (k, v) => { G.fx = G.fx || {}; G.fx[k] = v };
     const NS = { p: 'Физ', m: 'Маг', a: 'Ловк' };
+    const DIE_MS = 1700;
     function LR(who, k, x, as, y, df, ok, dmg) {
       const n = G.B.n = (G.B.n || 0) + 1, g = who === 'Голем'; G.last = { who, x, as, y, df, ok };
       L(ok ? (g ? `Попадание: ${dmg} урона` : `${who} попал: ${dmg} урона`) : (g ? 'Промах: 0 урона' : `${who} промахнулся: 0 урона`), ok ? (g ? 'hit' : 'bad') : 'miss', `${n}. ${who}: Атака (${NS[k]}) ${x}+${as}=${x + as}, защита ${y}+${df}=${y + df}.` + (ok ? ` Урон равен стату атаки (${as}).` : ''))
@@ -1065,7 +1082,17 @@
       if (G.ep < c.c) { L(`Не хватает очков зла: нужно ${c.c}.`); return ui() }
       G.ep -= c.c; G.ap--; G.hand.splice(i, 1); G.B = { rm, mons: [c], amb: 0 }; L(`Ты призвал: ${c.n}. Нападаешь первым.`); ui()
     }
-    function hurt(n) { FX('gh', n); G.hp -= n; if (G.hp <= 0) { G.hp = 0; G.over = 'lose' } }
+    function hurt(n) {
+      FX('gh', n); G.hp -= n; if (G.hp <= 0) { G.hp = 0; die(); }
+    }
+
+    function die() {
+      G.over = 'lose';
+      G.dead = Date.now();
+      L('Голем разрушен.');
+      setTimeout(ui, DIE_MS);
+    }
+
     function intent(m) {
       if (m.ab === 'axe' || m.ab === 'sphere') {
         const n = m.ab === 'axe' ? 'Рубящий удар (урон ×2)' : 'Тёмная сфера (урон 3, уклонение ловкостью)';
@@ -1176,13 +1203,13 @@
       ti.textContent = !G ? 'Выбор Голема' : G.over === 'lose' ? (G.hp <= 0 ? 'Голем разрушен' : 'Выход не найден') : G.over === 'win' ? 'Этаж пройден' : 'Голем в подземелье'; const fx = G ? G.fx : null; if (G) G.fx = null; const mvf = G ? G.mvfx : null; if (G) G.mvfx = null;
       if (!G) {
         const left = 5 - AL.reduce((x, y) => x + y, 0),
-        rows = [['Физ', 'Бьёшь физикой и защищаешься от ударов монстров (пока все они бьют физикой).', 'Монстры бьют по тебе физикой, защита будет слабой.'],
-        ['Маг', 'Бьёшь магией. Защиты не даёт: монстры пока бьют только физикой.', 'Магические удары почти всегда будут мимо.'],
-        ['Ловк', 'Нужна для побега. Ударов ловкостью нет.', 'Побег почти невозможен.']];
+          rows = [['Физ', 'Бьёшь физикой и защищаешься от ударов монстров (пока все они бьют физикой).', 'Монстры бьют по тебе физикой, защита будет слабой.'],
+          ['Маг', 'Бьёшь магией. Защиты не даёт: монстры пока бьют только физикой.', 'Магические удары почти всегда будут мимо.'],
+          ['Ловк', 'Нужна для побега. Ударов ловкостью нет.', 'Побег почти невозможен.']];
         A.innerHTML = `<div class="box"><h2>Распредели 5 очков голема</h2><p class="mut">Максимум 3 в одном стате. HP 8, груз 3, 2 действия за ход.</p>${rows.map((r, i) => `<div class="al"><div><b>${r[0]}</b><br><small class="mut">${r[1]}</small>${AL[i] == 0 ? `<br><small class="warn">Ноль: ${r[2]}</small>` : ''}</div><div class="alc"><button onclick="al(${i},-1)" ${AL[i] <= 0 ? 'disabled' : ''} aria-label="Меньше">−</button><span class="alv">${AL[i]}</span><button onclick="al(${i},1)" ${AL[i] >= 3 || left <= 0 ? 'disabled' : ''} aria-label="Больше">+</button></div></div>`).join('')}<p><b>Осталось очков: ${left}</b></p><p><button onclick="go(AL)" ${left ? 'disabled' : ''}>Начать игру</button></p><p class="mut">Быстрый выбор:</p><div class="cards">${BUILDS.map((b, i) => `<button class="card" onclick="pre(${i})"><b>${b.n}</b>физ ${b.s[0]}, маг ${b.s[1]}, ловк ${b.s[2]}</button>`).join('')}</div></div>`; return
       }
       const lg = '<ul class="lg">' + G.log.slice(0, 12).map(e => `<li class="${e.c}"><b>${e.a}</b>${e.b ? `<br><small>${e.b}</small>` : ''}</li>`).join('') + '</ul>';
-      if (G.over) { A.innerHTML = `<div class="box"><p><b>${G.over === 'win' ? 'Этаж пройден. Голем нашёл выход.' : G.hp <= 0 ? 'Голем разрушен.' : 'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over === 'lose' && G.hp > 0 ? '<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>' : ''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`; return }
+      if (G.over && (!G.dead || Date.now() - G.dead >= DIE_MS)) { A.innerHTML = `<div class="box"><p><b>${G.over === 'win' ? 'Этаж пройден. Голем нашёл выход.' : G.hp <= 0 ? 'Голем разрушен.' : 'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over === 'lose' && G.hp > 0 ? '<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>' : ''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`; return }
       const st = [['p', 'физ'], ['m', 'маг'], ['a', 'ловк']].map(([k, n]) => `${n} ${eff(k)}${G.tmp[k] ? ` (+${G.tmp[k]})` : ''}`).join(', ');
       const ks = Object.keys(G.map).map(k => k.split(',').map(Number)), cand = cands(), sz2 = G.pend && G.pend.sz === 2, dv = G.vert ? [0, 1] : [1, 0], pcor = G.pend && G.pend.t === 'cor';
       const ca = cand.find(c => G.ca && c[0] == G.ca[0] && c[1] == G.ca[1]) || cand[0];
@@ -1198,7 +1225,7 @@
         else cells += '<span></span>'
       }
       const gp = G.pos, gx = 18 + (gp[0] - x0) * 70, gy = 18 + (gp[1] - y0) * 70, fp = mvf ? mvf.f : gp, fxp = 18 + (fp[0] - x0) * 70, fyp = 18 + (fp[1] - y0) * 70;
-      const sprite = `<div class="gsp ${G.face === 'r' ? 'r ' : ''}${mvf ? 'run' : 'idle'}" style="left:${gx}px;top:${gy}px;--fx:${fxp}px;--fy:${fyp}px;--tx:${gx}px;--ty:${gy}px"></div>`;
+      const sprite = `<div class="gsp ${G.face === 'r' ? 'r ' : ''}${G.dead ? 'dead' : mvf ? 'run' : 'idle'}" style="left:${gx}px;top:${gy}px;--fx:${fxp}px;--fy:${fyp}px;--tx:${gx}px;--ty:${gy}px"></div>`;
       const hl = c => T.on && TS[T.i].s === c ? ' hl' : '';
       let dc = '';
       if (G.last) { const l = G.last; dc = `<div class="dice${fx ? ' anim' : ''}">` + (l.entry ? `<p class="mut">Проверка входа</p><span class="die">${l.q}</span> против зла <b>${l.e}</b>: ${l.q > l.e ? 'засады нет' : 'засада'}` : `<p class="mut">Последний бросок: ${l.who}</p><span class="die">${l.x}</span> +${l.as} = <b>${l.x + l.as}</b> против <span class="die">${l.y}</span> +${l.df} = <b>${l.y + l.df}</b><br>${l.ok ? 'Попадание' : 'Промах'}`) + '</div>' }
