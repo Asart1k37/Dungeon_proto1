@@ -22,3 +22,11 @@ function dbgPoints() {
   G.ep += 5;
   ui();
 }
+
+function enrage(m) {
+  if (m.hp <= m.mx / 2 && !m.rg) {
+    m.p += 1;
+    m.rg = true;
+    L('Ярость босса', 'bad', `Босс в ярости! Его физическая сила увеличена на 1.`);
+  }
+}

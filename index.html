@@ -225,6 +225,17 @@
       margin: 6px 0 0
     }
 
+    .pic {
+      image-rendering: pixelated;
+      display: block;
+      margin: 0 auto 6px;
+      filter: drop-shadow(0 0 8px #05d9e866)
+    }
+
+    .hc .pic {
+      margin: 0 0 2px
+    }
+
     .cell.cor {
       border-style: dashed;
       font-size: 15px
@@ -933,7 +944,9 @@
           сам выбираешь, что сбросить: добро уходит в сброс, монстры возвращаются в логово.</li>
         <li>Клавиши: 1–5 карты в руке, Q, W, E удар физикой, магией и побег, стрелки или WASD идти и выбирать клетку,
           Enter поставить комнату, R повернуть, Пробел завершить ход.</li>
-        <li>Выход лежит в нижней части колоды. Вход в него заканчивает этаж. Комнаты в колоде конечны: если они
+        <li>В нижней части колоды лежит комната босса (на карте подписана «БОСС»), это и есть выход этажа. Входить в неё
+          сразу необязательно, можно сначала подготовиться. Босс бьёт первым, а победа над ним проходит этаж. Комнаты в
+          колоде конечны: если они
           кончились, а выход не найден, этаж проигран.</li>
       </ul>
     </details>
@@ -954,11 +967,11 @@
   <script src="mine.js"></script>
   <script>
     const r = n => Math.floor(Math.random() * n), d6 = () => 1 + r(6), sh = a => { for (let i = a.length - 1; i > 0; i--) { const j = r(i + 1);[a[i], a[j]] = [a[j], a[i]] } return a };
-    const MON = { gob: { n: 'Гоблин', r: 1, c: 1, hp: 3, p: 1, m: 1, a: 2 }, arb: { n: 'Гоблин с арбалетом', r: 2, c: 2, hp: 3, p: 2, m: 1, a: 1 }, ske: { n: 'Скелет', r: 1, c: 2, hp: 4, p: 2, m: 1, a: 1 }, spe: { n: 'Скелет-копейщик', r: 2, c: 3, hp: 4, p: 3, m: 1, a: 0 }, zom: { n: 'Зомби', r: 1, c: 2, hp: 6, p: 2, m: 1, a: 0 }, shd: { n: 'Зомби со щитом', r: 1, c: 3, hp: 7, p: 2, m: 1, a: 1, sh: 1 }, kn: { n: 'Скелет-рыцарь', el: 1, c: 4, hp: 8, p: 3, m: 1, a: 0, r: 1, ab: 'axe', cd: 2 }, mg: { n: 'Тёмный маг', el: 1, c: 4, hp: 4, p: 0, m: 3, a: 1, r: 2, at: 'm', ab: 'sphere', cd: 3 }, sl: { n: 'Ржавая слизь', el: 1, c: 3, hp: 7, p: 1, m: 1, a: 0, r: 1, ab: 'rust' } };
+    const MON = { gob: { n: 'Гоблин', r: 1, c: 1, hp: 3, p: 1, m: 1, a: 2 }, arb: { n: 'Гоблин с арбалетом', r: 2, c: 2, hp: 3, p: 2, m: 1, a: 1 }, ske: { n: 'Скелет', r: 1, c: 2, hp: 4, p: 2, m: 1, a: 1 }, spe: { n: 'Скелет-копейщик', r: 2, c: 3, hp: 4, p: 3, m: 1, a: 0 }, zom: { n: 'Зомби', r: 1, c: 2, hp: 6, p: 2, m: 1, a: 0 }, shd: { n: 'Зомби со щитом', r: 1, c: 3, hp: 7, p: 2, m: 1, a: 1, sh: 1 }, kn: { n: 'Скелет-рыцарь', el: 1, c: 4, hp: 8, p: 3, m: 1, a: 0, r: 1, ab: 'axe', cd: 2 }, mg: { n: 'Тёмный маг', el: 1, c: 4, hp: 4, p: 0, m: 3, a: 1, r: 2, at: 'm', ab: 'sphere', cd: 3 }, sl: { n: 'Ржавая слизь', el: 1, c: 3, hp: 7, p: 1, m: 1, a: 0, r: 1, ab: 'rust' }, bs: { n: 'Рыцарь-великан', boss: 1, el: 1, c: 9, hp: 12, p: 3, m: 1, a: 0, r: 1, ab: 'boss' } };
     const IT = { pl: { n: 'Стальные пластины', cap: 2, g: 1, p: 1, e: '+1 физ' }, le: { n: 'Кристалл-линза', cap: 2, g: 1, m: 1, e: '+1 маг' }, sp: { n: 'Пружинные сочленения', cap: 1, g: 1, a: 1, e: '+1 ловк' }, rg: { n: 'Манипулятор-удлинитель', cap: 1, g: 1, r: 1, e: '+1 дальность' }, tk: { n: 'Запасной бак', cap: 1, g: 1, hp: 2, e: '+2 HP' }, ar: { n: 'Бронеплита', cap: 3, g: 2, hp: 3, e: '+3 HP' } };
     const SP = { rep: { n: 'Ремонт', g: 1, e: '+2 HP сейчас' }, ov: { n: 'Перегрузка', g: 1, p: 1, e: '+1 физ до конца боя' }, fo: { n: 'Фокус', g: 1, m: 1, e: '+1 маг до конца боя' }, lu: { n: 'Смазка', g: 1, a: 1, e: '+1 ловк до конца боя' } };
     const BUILDS = [{ n: 'Силач', s: [3, 1, 1] }, { n: 'Маг', s: [1, 3, 1] }, { n: 'Универсал', s: [2, 2, 1] }];
-    const NM = { start: 'Вход', norm: 'Комната', rest: 'Комната отдыха', cor: 'Коридор', loot: 'Комната с добычей', exit: 'Выход с этажа' };
+    const NM = { start: 'Вход', norm: 'Комната', rest: 'Комната отдыха', cor: 'Коридор', boss: 'Комната босса', loot: 'Комната с добычей', exit: 'Выход с этажа' };
     const D = [[1, 0], [-1, 0], [0, 1], [0, -1]], key = (x, y) => x + ',' + y;
     let G = null, AL = [2, 2, 1];
     function al(i, d) { const n = AL[i] + d; if (n < 0 || n > 3 || AL.reduce((x, y) => x + y, 0) + d > 5) return; AL[i] = n; ui() }
@@ -979,6 +992,7 @@
     { s: 'w-log', t: 'Здесь записан каждый бросок: кубик плюс стат нападающего против кубика плюс тот же стат защищающегося. Если сумма нападающего больше, он попал, а урон равен стату его атаки.' },
     { s: 'w-enemy', t: 'Побег решается тем же броском на ловкость. Выиграл на 3 и больше: уходишь в прошлую комнату. Выиграл меньше: остаёшься в комнате вне ближнего боя, но монстры с дальностью 2 стреляют вдогонку. Предмет на дальность даст выстрел в ответ.' },
     { s: 'w-enemy', t: 'У элитных врагов есть способности. Жёлтая строка в окне «Враг» показывает, что он сделает следующим ходом: например, рыцарь ход заряжает удар, а потом бьёт вдвое сильнее. Заряжающегося врага можно убить или убежать от него.' },
+    { s: 'w-field', t: 'Комната босса: она лежит в нижней части колоды и подписана «БОСС». Босс бьёт первым и ходит по кругу: атака, зарядка топора, сокрушающий удар, пауза. Жёлтая строка в окне «Враг» показывает, что будет дальше. Победа над боссом проходит этаж.' },
     { s: 'w-hand', t: 'Карты добра стоят очки добра, а их дают за убитых монстров. Монстров из руки можно призвать за очки зла, которые даёт вход в новую комнату. В конце хода рука добирается до 5 карт, а если их больше 5, лишние нужно сбросить.' },
     { s: 'w-items', t: 'Предметы занимают груз (всего 3) и дают постоянные бонусы. Снятый предмет уходит в сброс. Цель этажа: найти выход, он лежит в нижней части колоды. Комнаты в колоде конечны: если они закончатся до выхода, ты проиграешь.' },
     { s: 'w-field', t: 'Коридоры соединяются только концами: прямой слева и справа, угловой под прямым углом. R поворачивает их. В коридоре нет засады, но в коридоре с ловушкой голем может получить урон.' },
@@ -989,13 +1003,15 @@
     const rng = () => 1 + G.eq.reduce((x, i) => x + (i.r || 0), 0);
     const cap = () => G.eq.reduce((x, i) => x + i.cap, 0);
     const rs = () => { if (!G.evil.length && G.eDis.length) { G.evil = sh(G.eDis); G.eDis = [] } };
-    const lab = rm => rm.t === 'cor' ? gl(rm.dirs) + (rm.trap ? ' Ловушка' : ' Коридор') : rm.t === 'start' ? 'Вход' : rm.sz === 2 ? (rm.t === 'loot' ? 'Склад' : 'Зал') + ', зло ' + rm.e : rm.t === 'norm' ? 'Зло ' + rm.e : rm.t === 'rest' ? 'Отдых' : rm.t === 'loot' ? 'Лут, зло ' + rm.e : 'Выход';
+    const PIC = { gob: 'Goblin.png', arb: 'Cross-Goblin.png', ske: 'Skeleton.png', spe: 'S-Skeleton.png', zom: 'Zombie.png', shd: 'S-zombie.png', kn: 'Skeleton-Warior.png', mg: 'D-mage.png', sl: 'Slime.png', bs: 'Boss.png' };
+    const pic = (k, z) => PIC[k] ? `<img class="pic" src="img/${PIC[k]}" alt="" width="${64 * z}" height="${64 * z}" onerror="this.style.display='none'">` : '';
+    const lab = rm => rm.t === 'boss' ? 'БОСС' : rm.t === 'cor' ? gl(rm.dirs) + (rm.trap ? ' Ловушка' : ' Коридор') : rm.t === 'start' ? 'Вход' : rm.sz === 2 ? (rm.t === 'loot' ? 'Склад' : 'Зал') + ', зло ' + rm.e : rm.t === 'norm' ? 'Зло ' + rm.e : rm.t === 'rest' ? 'Отдых' : rm.t === 'loot' ? 'Лут, зло ' + rm.e : 'Выход';
     function go(b) {
       const it = ['pl', 'pl', 'le', 'sp', 'rg', 'tk', 'ar'].map(k => ({ t: 'item', k, ...IT[k] }));
       const spl = ['rep', 'rep', 'ov', 'ov', 'fo', 'fo', 'lu', 'lu'].map(k => ({ t: 'spell', k, ...SP[k] }));
       const d = sh([...[1, 1, 1, 2, 2, 2, 3, 3].map(e => ({ t: 'norm', e })), { t: 'rest' }, { t: 'loot', e: 4 }, { t: 'loot', e: 4 }, { t: 'norm', e: 4, sz: 2 }, { t: 'loot', e: 5, sz: 2 }, ...[['str', 0], ['str', 0], ['str', 2], ['cnr', 0], ['cnr', 0], ['cnr', 2]].map(([k, trap]) => ({ t: 'cor', k, trap }))]);
-      d.forEach(x => x.mons = []); d.splice(r(5), 0, { t: 'exit', mons: [] });
-      const ev = []; for (const k in MON) for (let i = 0; i < (MON[k].el ? 1 : 2); i++)ev.push({ t: 'mon', k, ...MON[k], mx: MON[k].hp });
+      d.forEach(x => x.mons = []); d.splice(r(5), 0, { t: 'boss', mons: [{ t: 'mon', k: 'bs', ...MON.bs, mx: MON.bs.hp }] });
+      const ev = []; for (const k in MON) if (!MON[k].boss) for (let i = 0; i < (MON[k].el ? 1 : 2); i++)ev.push({ t: 'mon', k, ...MON[k], mx: MON[k].hp });
       G = { hp: 8, mx: 8, s: { p: b[0], m: b[1], a: b[2] }, eq: [], tmp: { p: 0, m: 0, a: 0 }, gp: 2, ep: 0, ap: 2, good: sh([...it, ...spl]), evil: sh(ev), eDis: [], gDis: [], dun: d, map: { '0,0': { t: 'start', e: 0, vis: 1, mons: [], cells: [[0, 0]] } }, pos: [0, 0], prev: [0, 0], pend: null, hand: [], B: null, log: [], over: null, turn: 1 };
       drawUp(); newTurn(); ui()
     }
@@ -1056,12 +1072,12 @@
       }
       return out
     }
-    function clear(rm) { if (rm.t === 'loot' && !rm.lt) { rm.lt = 1; const got = []; for (let i = 0; i < (rm.sz === 2 ? 3 : 2) && G.good.length; i++) { const c = G.good.pop(); G.hand.push(c); got.push(c.n) } L('Добыча: ' + (got.join(', ') || 'ничего, колода добра пуста') + '.') } }
+    function clear(rm) { if (rm.t === 'boss') { G.over = 'win'; L('Босс побеждён! Этаж пройден.', 'ok'); return } if (rm.t === 'loot' && !rm.lt) { rm.lt = 1; const got = []; for (let i = 0; i < (rm.sz === 2 ? 3 : 2) && G.good.length; i++) { const c = G.good.pop(); G.hand.push(c); got.push(c.n) } L('Добыча: ' + (got.join(', ') || 'ничего, колода добра пуста') + '.') } }
     function move(x, y) {
       if (G.B || G.pend || G.ap < 1 || G.over) return; const rm = G.map[key(x, y)]; if (!rm || !canGo(x, y)) return;
       if (typeof window !== 'undefined') { if (Date.now() - (G.mv || 0) < 450) return; G.mv = Date.now() }
       G.ap--; { const dx = x - G.pos[0]; if (dx) G.face = dx > 0 ? 'r' : 'l' } G.mvfx = { f: [...G.pos] }; G.prev = G.pos; G.pos = [x, y]; const first = !rm.vis; rm.vis = 1;
-      if (rm.t === 'exit') { G.over = 'win'; return ui() }
+      if (rm.t === 'exit') { G.over = 'win'; return ui() } if (rm.t === 'boss') { if (!rm.mons.length) { G.over = 'win'; return ui() } L(first ? 'Комната босса. ' + rm.mons[0].n + ' ждёт и нападает первым.' : 'Босс снова нападает.', 'bad'); G.B = { rm, mons: rm.mons, amb: 1 }; mTurn(); return ui() }
       if (rm.t === 'rest') { if (first) { G.hp = Math.min(G.mx, G.hp + 3); L('Комната отдыха: +3 HP.', 'ok'); FX('heal', 3) } else L('Комната отдыха уже использована.'); return ui() }
       if (rm.t === 'cor') { if (first) { L(rm.trap ? 'Коридор с ловушкой.' : 'Коридор: засады нет, проверка не нужна.', 'ok'); if (rm.trap && typeof trap === 'function') trap(rm) } return ui() }
       if (first) { G.ep += rm.e; L(`Новая комната (зло ${rm.e}): +${rm.e} очк. зла.`) }
@@ -1094,6 +1110,7 @@
     }
 
     function intent(m) {
+      if (m.ab === 'boss') { const ph = m.ph || 0; return ph === 0 ? 'Следующий ход: обычная атака' : ph === 1 ? 'Следующий ход: заносит топор' : ph === 2 ? 'Следующий ход: СОКРУШАЮЩИЙ УДАР (урон 4, уклонение ловкостью)!' : 'Следующий ход: пауза, топор застрял. Бей!' }
       if (m.ab === 'axe' || m.ab === 'sphere') {
         const n = m.ab === 'axe' ? 'Рубящий удар (урон ×2)' : 'Тёмная сфера (урон 3, уклонение ловкостью)';
         if (m.ch) return 'Следующий ход: ' + n + '!'; if (!m.cc) return 'Следующий ход: заряжает «' + n.split(' (')[0] + '»'; return `Следующий ход: обычная атака (до зарядки ещё ${m.cc})`
@@ -1102,6 +1119,15 @@
     }
     function mTurn() {
       const m = G.B.mons[0], at = m.at || 'p';
+      if (m.ab === 'boss') {
+        const ph = m.ph || 0; m.ph = (ph + 1) % 4;
+        if (ph === 1) { L(`${m.n} заносит топор.`, 'bad', 'Следующим ходом будет Сокрушающий удар. Убей его, уйди или готовься.'); return }
+        if (ph === 3) { L(`${m.n}: топор застрял, пауза.`, 'ok', 'Босс пропускает ход. Бей!'); return }
+        if (ph === 2) {
+          const x = d6(), y = d6(), as = m.p + 1, df = eff('a'), ok = x + as > y + df, n = G.B.n = (G.B.n || 0) + 1; G.last = { who: m.n, x, as, y, df, ok };
+          L(`${m.n}: Сокрушающий удар ` + (ok ? 'попал, урон 4' : 'мимо'), ok ? 'bad' : 'miss', `${n}. Ловк (уклонение) ${x}+${as}=${x + as}, защита ${y}+${df}=${y + df}.`); if (ok) hurt(4); return
+        }
+      }
       if (m.ab === 'axe' || m.ab === 'sphere') {
         const big = m.ab === 'axe', nm = big ? 'Рубящий удар' : 'Тёмная сфера';
         if (m.ch) {
@@ -1133,8 +1159,8 @@
         const df = m[k] + (k === 'p' && m.sh ? 1 : 0), dm = eff(k), ok = x + dm > y + df;
         LR('Голем', k, x, dm, y, df, ok, dm);
         if (ok) {
-          FX('eh', dm); m.hp -= dm; if (m.hp <= 0) {
-            G.gp += m.c; L(`${m.n} разрушен: +${m.c} очк. добра.`); B.mons.shift(); m.hp = m.mx; m.ch = 0; m.cc = 0; G.eDis.push(m);
+          FX('eh', dm); m.hp -= dm; if (m.boss && typeof enrage === 'function') enrage(m); if (m.hp <= 0) {
+            G.gp += m.c; L(`${m.n} разрушен: +${m.c} очк. добра.`); B.mons.shift(); m.hp = m.mx; m.ch = 0; m.cc = 0; if (!m.boss) G.eDis.push(m);
             if (!B.mons.length) { G.tmp = { p: 0, m: 0, a: 0 }; G.B = null; L('Бой выигран.'); if (B.amb) clear(B.rm); return ui() }
           }
         }
@@ -1150,7 +1176,7 @@
       if (rng() >= 2 && !G.over && B.mons.length) {
         const f = B.mons[0], k = (eff('m') - f.m > eff('p') - f.p) ? 'm' : 'p', dm = eff(k), df = f[k] + (k === 'p' && f.sh ? 1 : 0), x = d6(), y = d6(), ok = x + dm > y + df;
         L('Твой выстрел вдогонку: ' + (ok ? `попал, урон ${dm}.` : 'мимо.'), ok ? 'hit' : 'miss', `${NS[k]} ${x}+${dm}=${x + dm} против ${y}+${df}=${y + df}.`);
-        if (ok) { FX('eh', dm); f.hp -= dm; if (f.hp <= 0) { G.gp += f.c; L(`${f.n} разрушен: +${f.c} очк. добра.`); B.mons.shift(); f.hp = f.mx; f.ch = 0; f.cc = 0; G.eDis.push(f) } }
+        if (ok) { FX('eh', dm); f.hp -= dm; if (f.boss && typeof enrage === 'function') enrage(f); if (f.hp <= 0) { G.gp += f.c; L(`${f.n} разрушен: +${f.c} очк. добра.`); B.mons.shift(); f.hp = f.mx; f.ch = 0; f.cc = 0; if (!f.boss) G.eDis.push(f); if (f.boss && !B.mons.length) { G.over = 'win'; L('Босс побеждён! Этаж пройден.', 'ok') } } }
       }
     }
     function play(i) {
@@ -1180,7 +1206,7 @@
       const f = (id, l) => { document.getElementById(id).innerHTML = l.map(([v, n]) => `<option value="${v}">${n}</option>`).join('') };
       f('dm', Object.keys(MON).map(k => [k, MON[k].n + (MON[k].el ? ' (элита)' : '')]));
       f('dc', [...Object.keys(IT).map(k => ['i:' + k, 'Предмет: ' + IT[k].n]), ...Object.keys(SP).map(k => ['s:' + k, 'Заклинание: ' + SP[k].n])]);
-      f('dr', [['exit', 'Выход'], ['rest', 'Комната отдыха'], ['loot', 'Комната с добычей'], ['hall', 'Большой зал'], ['str', 'Прямой коридор'], ['strt', 'Прямой коридор с ловушкой'], ['cnr', 'Угловой коридор'], ['cnrt', 'Угловой коридор с ловушкой'], ['norm1', 'Комната, зло 1'], ['norm3', 'Комната, зло 3']])
+      f('dr', [['exit', 'Выход'], ['boss', 'Комната босса'], ['rest', 'Комната отдыха'], ['loot', 'Комната с добычей'], ['hall', 'Большой зал'], ['str', 'Прямой коридор'], ['strt', 'Прямой коридор с ловушкой'], ['cnr', 'Угловой коридор'], ['cnrt', 'Угловой коридор с ловушкой'], ['norm1', 'Комната, зло 1'], ['norm3', 'Комната, зло 3']])
     }
     function dbgMon(k) {
       if (!G || G.over) return; k = k || document.getElementById('dm').value; const m = { t: 'mon', k, ...MON[k], mx: MON[k].hp }, rm = G.map[key(...G.pos)];
@@ -1189,8 +1215,8 @@
     function dbgCard(v) { if (!G || G.over) return; v = v || document.getElementById('dc').value; const [t, k] = v.split(':'); G.hand.push(t === 'i' ? { t: 'item', k, ...IT[k] } : { t: 'spell', k, ...SP[k] }); L('Отладка: карта добавлена в руку.'); ui() }
     function dbgRoom(v) {
       if (!G || G.over) return; v = v || document.getElementById('dr').value;
-      const R = { exit: { t: 'exit' }, rest: { t: 'rest' }, loot: { t: 'loot', e: 4 }, hall: { t: 'norm', e: 4, sz: 2 }, str: { t: 'cor', k: 'str', trap: 0 }, strt: { t: 'cor', k: 'str', trap: 2 }, cnr: { t: 'cor', k: 'cnr', trap: 0 }, cnrt: { t: 'cor', k: 'cnr', trap: 2 }, norm1: { t: 'norm', e: 1 }, norm3: { t: 'norm', e: 3 } }[v];
-      if (G.pend) G.dun.push(G.pend); G.pend = { ...R, mons: [] }; G.ca = null; L('Отладка: следующая комната «' + v + '».'); ui()
+      const R = { exit: { t: 'exit' }, boss: { t: 'boss' }, rest: { t: 'rest' }, loot: { t: 'loot', e: 4 }, hall: { t: 'norm', e: 4, sz: 2 }, str: { t: 'cor', k: 'str', trap: 0 }, strt: { t: 'cor', k: 'str', trap: 2 }, cnr: { t: 'cor', k: 'cnr', trap: 0 }, cnrt: { t: 'cor', k: 'cnr', trap: 2 }, norm1: { t: 'norm', e: 1 }, norm3: { t: 'norm', e: 3 } }[v];
+      if (G.pend) G.dun.push(G.pend); G.pend = { ...R, mons: R.t === 'boss' ? [{ t: 'mon', k: 'bs', ...MON.bs, mx: MON.bs.hp }] : [] }; G.ca = null; L('Отладка: следующая комната «' + v + '».'); ui()
     }
     function dbgState() {
       if (!G) return; const o = { hp: G.hp, mx: G.mx, gp: G.gp, ep: G.ep, ap: G.ap, turn: G.turn, pos: G.pos, hand: G.hand.map(c => c.n), eq: G.eq.map(c => c.n), good: G.good.length, evil: G.evil.length, dun: G.dun.length, tmp: G.tmp };
@@ -1209,7 +1235,7 @@
         A.innerHTML = `<div class="box"><h2>Распредели 5 очков голема</h2><p class="mut">Максимум 3 в одном стате. HP 8, груз 3, 2 действия за ход.</p>${rows.map((r, i) => `<div class="al"><div><b>${r[0]}</b><br><small class="mut">${r[1]}</small>${AL[i] == 0 ? `<br><small class="warn">Ноль: ${r[2]}</small>` : ''}</div><div class="alc"><button onclick="al(${i},-1)" ${AL[i] <= 0 ? 'disabled' : ''} aria-label="Меньше">−</button><span class="alv">${AL[i]}</span><button onclick="al(${i},1)" ${AL[i] >= 3 || left <= 0 ? 'disabled' : ''} aria-label="Больше">+</button></div></div>`).join('')}<p><b>Осталось очков: ${left}</b></p><p><button onclick="go(AL)" ${left ? 'disabled' : ''}>Начать игру</button></p><p class="mut">Быстрый выбор:</p><div class="cards">${BUILDS.map((b, i) => `<button class="card" onclick="pre(${i})"><b>${b.n}</b>физ ${b.s[0]}, маг ${b.s[1]}, ловк ${b.s[2]}</button>`).join('')}</div></div>`; return
       }
       const lg = '<ul class="lg">' + G.log.slice(0, 12).map(e => `<li class="${e.c}"><b>${e.a}</b>${e.b ? `<br><small>${e.b}</small>` : ''}</li>`).join('') + '</ul>';
-      if (G.over && (!G.dead || Date.now() - G.dead >= DIE_MS)) { A.innerHTML = `<div class="box"><p><b>${G.over === 'win' ? 'Этаж пройден. Голем нашёл выход.' : G.hp <= 0 ? 'Голем разрушен.' : 'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over === 'lose' && G.hp > 0 ? '<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>' : ''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`; return }
+      if (G.over && (!G.dead || Date.now() - G.dead >= DIE_MS)) { A.innerHTML = `<div class="box"><p><b>${G.over === 'win' ? 'Этаж пройден.' : G.hp <= 0 ? 'Голем разрушен.' : 'Колода подземелья закончилась, выход не найден.'}</b></p><p class="mut">Ходов: ${G.turn}. Осталось карт добра: ${G.good.length}.</p>${G.over === 'lose' && G.hp > 0 ? '<p>Комнаты выкладываются по одной за ход, поэтому каждый переход тоже расходует колоду. Если они кончились, а выхода нет, этаж проигран.</p>' : ''}<button onclick="G=null;ui()">Начать заново</button></div>${lg}`; return }
       const st = [['p', 'физ'], ['m', 'маг'], ['a', 'ловк']].map(([k, n]) => `${n} ${eff(k)}${G.tmp[k] ? ` (+${G.tmp[k]})` : ''}`).join(', ');
       const ks = Object.keys(G.map).map(k => k.split(',').map(Number)), cand = cands(), sz2 = G.pend && G.pend.sz === 2, dv = G.vert ? [0, 1] : [1, 0], pcor = G.pend && G.pend.t === 'cor';
       const ca = cand.find(c => G.ca && c[0] == G.ca[0] && c[1] == G.ca[1]) || cand[0];
@@ -1233,9 +1259,9 @@
       const fG = fx ? (fx.gh ? fl('-' + fx.gh) : '') + (fx.heal ? fl('+' + fx.heal, 'g') : '') : '', fE = fx && fx.eh ? fl('-' + fx.eh) : '';
       const tu = T.on ? `<div class="box tut"><p class="mut">Обучение, шаг ${T.i + 1} из ${TS.length}</p><p>${TS[T.i].t}</p><button onclick="tn()">${T.i + 1 < TS.length ? 'Дальше' : 'Играть'}</button> <button onclick="tn(1)">Пропустить</button></div>` : '<p><button onclick="T={on:1,i:0};ui()">Обучение</button></p>';
       let bt = '<p class="mut">Врага нет. Он появится при засаде или призыве.</p>';
-      if (G.B) { const m = G.B.mons, f = m[0]; bt = `<p><b>${f.n}</b>${f.el ? ' <span class="warn">(элита)</span>' : ''}<br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}, дальность ${f.r}${f.sh ? '<br>Щит: +1 к защите от физ.' : ''}</p><p class="intent">${intent(f)}</p>${m.length > 1 ? `<p class="mut">Следом: ${m.slice(1).map(x => x.n).join(', ')}.</p>` : ''}<div class="acts"><button onclick="act('p')">Бить физикой [Q] (${eff('p')})</button><button onclick="act('m')">Бить магией [W] (${eff('m')})</button><button onclick="act('a')">Бежать [E] (${eff('a')})</button></div><p class="mut">Побег: выиграл на 3 и больше, и ты в прошлой комнате. Меньше: остался здесь, но дальнобойные монстры (дальность 2) стреляют вдогонку.</p>` }
+      if (G.B) { const m = G.B.mons, f = m[0]; bt = `${pic(f.k, 3)}<p><b>${f.n}</b>${f.el ? ' <span class="warn">(элита)</span>' : ''}<br>HP ${f.hp}/${f.mx}<br>физ ${f.p}, маг ${f.m}, ловк ${f.a}, дальность ${f.r}${f.sh ? '<br>Щит: +1 к защите от физ.' : ''}</p><p class="intent">${intent(f)}</p>${m.length > 1 ? `<p class="mut">Следом: ${m.slice(1).map(x => x.n).join(', ')}.</p>` : ''}<div class="acts"><button onclick="act('p')">Бить физикой [Q] (${eff('p')})</button><button onclick="act('m')">Бить магией [W] (${eff('m')})</button><button onclick="act('a')">Бежать [E] (${eff('a')})</button></div><p class="mut">Побег: выиграл на 3 и больше, и ты в прошлой комнате. Меньше: остался здесь, но дальнобойные монстры (дальность 2) стреляют вдогонку.</p>` }
 
-      const hand = G.disc ? G.hand.map((c, i) => `<button class="hc" onclick="drop(${i})"><b>[${i + 1}] ${c.n}</b> ${c.t === 'mon' ? 'зло ' + c.c : 'добро ' + c.g}<small>Нажми, чтобы сбросить</small></button>`).join('') : G.hand.map((c, i) => c.t === 'mon' ? `<button class="hc mon" onclick="summon(${i})" ${G.B || G.pend || G.ap < 1 || G.ep < c.c ? 'disabled' : ''}><b>[${i + 1}] ${c.n}</b> зло ${c.c}<small>Дальность ${c.r}. Призвать и напасть первым</small></button>` : `<button class="hc" onclick="play(${i})" ${G.B || G.pend || G.ap < 1 ? 'disabled' : ''}><b>[${i + 1}] ${c.n}</b> добро ${c.g}${c.cap ? `, груз ${c.cap}` : ''}<small>${c.e}</small></button>`).join('');
+      const hand = G.disc ? G.hand.map((c, i) => `<button class="hc" onclick="drop(${i})"><b>[${i + 1}] ${c.n}</b> ${c.t === 'mon' ? 'зло ' + c.c : 'добро ' + c.g}<small>Нажми, чтобы сбросить</small></button>`).join('') : G.hand.map((c, i) => c.t === 'mon' ? `<button class="hc mon" onclick="summon(${i})" ${G.B || G.pend || G.ap < 1 || G.ep < c.c ? 'disabled' : ''}>${pic(c.k, 1)}<b>[${i + 1}] ${c.n}</b> зло ${c.c}<small>Дальность ${c.r}. Призвать и напасть первым</small></button>` : `<button class="hc" onclick="play(${i})" ${G.B || G.pend || G.ap < 1 ? 'disabled' : ''}><b>[${i + 1}] ${c.n}</b> добро ${c.g}${c.cap ? `, груз ${c.cap}` : ''}<small>${c.e}</small></button>`).join('');
       const eq = G.eq.length ? G.eq.map((c, j) => `<p>${c.n} (${c.e}, груз ${c.cap}) <button onclick="unq(${j})" ${G.B ? 'disabled' : ''}>Снять</button></p>`).join('') : '<p class="mut">Предметов нет.</p>';
       const hint = G.pend ? `Вытянуто: ${NM[G.pend.t].toLowerCase()}${G.pend.e ? `, зло ${G.pend.e}` : ''}. ${G.pend.sz === 2 ? 'Это большая комната на 2 клетки, R поворачивает её. ' : G.pend.t === 'cor' ? 'Коридор соединяется только концами, R поворачивает его. ' : ''}Нажми «+» (или стрелки и Enter).` : G.B ? 'Идёт бой.' : 'Нажми на соседнюю комнату или стрелки/WASD, чтобы перейти.';
       A.innerHTML = `${tu}<div class="grid"><section class="box w-hand${hl('w-hand')}"><h2>Рука</h2>${G.disc ? `<p class="warn">Конец хода. Сбрось минимум ${G.need} (сброшено: ${G.dn}). Добро уйдёт в сброс, монстры вернутся в логово. Потом рука добавится до 5 карт.</p><p><button onclick="done()" ${G.dn < G.need && G.hand.length ? 'disabled' : ''}>Готово [Пробел]</button></p>` : ''}${hand || '<p class="mut">Пусто</p>'}</section><section class="box w-char${hl('w-char')}${fx && fx.gh ? ' flash' : ''}"><h2>Карта персонажа</h2><p><b>HP ${G.hp}/${G.mx}</b></p><p>${st}</p><p>Груз ${cap()}/3. Дальность ${rng()}. Добро ${G.gp}, зло ${G.ep}.</p><p><b>Действий: ${G.ap}</b></p><p class="${G.good.length <= 3 ? 'warn' : ''}">Карт добра: ${G.good.length}.</p><p class="${G.dun.length <= 3 ? 'warn' : ''}">Комнат в колоде: ${G.dun.length}${G.dun.length <= 3 ? '. Когда они кончатся, а выход не найден, ты проиграешь.' : ''} <span class="mut">Ход ${G.turn}.</span></p>${fG}</section><section class="box w-items${hl('w-items')}"><h2>Предметы</h2>${eq}</section><section class="box w-enemy${hl('w-enemy')}${fx && fx.eh ? ' shake' : ''}"><h2>Враг</h2>${dc}${bt}${fE}</section><section class="box w-field${hl('w-field')}"><h2>Поле</h2><p class="mut">${hint}</p>${G.pend && (G.pend.sz === 2 || G.pend.t === 'cor') ? `<p><button onclick="rot()">Повернуть [R]</button></p>` : ''}<div class="map" style="grid-template-columns:repeat(${x1 - x0 + 1},64px)">${cells}${sprite}</div><p><button onclick="endTurn()" ${G.B || G.pend || G.disc ? 'disabled' : ''}>Завершить ход [Пробел]</button></p></section><section class="box w-log${hl('w-log')}"><h2>История</h2>${lg}</section></div>`
